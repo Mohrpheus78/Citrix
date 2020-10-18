@@ -19,14 +19,14 @@
         Execute as logon script or WEM external task to show useful informations about the user environment
 		
     .EXAMPLE
-		    WEM:
-		    Path: powershell.exe
-		    Arguments: -executionpolicy bypass -file "C:\Program Files (x86)\SuL\Citrix Management Tools\BGInfo\BGInfo.ps1"
-		    .FSLogix Profile Size Warning.ps1
+	WEM:
+	Path: powershell.exe
+	Arguments: -executionpolicy bypass -file "C:\Program Files (x86)\SuL\Citrix Management Tools\BGInfo\BGInfo.ps1"
+	.FSLogix Profile Size Warning.ps1
 	    
     .NOTES
-		    Execute as WEM external task (also after reconnect to refresh the information), logonscript or task at logon
-		    Edit the $BGInfoDir (Directory with BGInfo.exe) and $BGInfoFile (BGI file to load)
+	Execute as WEM external task (also after reconnect to refresh the information), logonscript or task at logon
+	Edit the $BGInfoDir (Directory with BGInfo.exe) and $BGInfoFile (BGI file to load)
 #>
 
 # *******************
