@@ -1,21 +1,37 @@
-##############################
+# *******************************************************
+# D. Mohrmann, S&L Firmengruppe, Twitter: @mohrpheus78
 # BGInfo powered by Powershell
-##############################
+# 05/12/19	DM	Initial release
+# 06/12/19	DM	Added FSLogix
+# 09/12/19	DM	Added deviceTRUST
+# 11/12/19	DM	Initial public release
+# 11/12/19	DM	Changed method to get session id
+# 18/06/20	DM  Added MTU Size, WEM and VDA Agent version
+# 26/06/20	DM	Added FSLogix Version
+# 26/06/20	DM	Changed BGInfo process handling
+# *******************************************************
 
 <#
-    Shows information about the user Citrix environment as BGInfo taskbar icon
+    .SYNOPSIS
+        Shows information about the user Citrix environment as BGInfo taskbar icon
+		
+    .Description
+        Execute as logon script or WEM external task to show useful informations about the user environment
+		
+    .EXAMPLE
+	WEM:
+	Path: powershell.exe
+	Arguments: -executionpolicy bypass -file "C:\Program Files (x86)\SuL\Citrix Management Tools\BGInfo\BGInfo-Taskbar-Taskbar.ps1"
+	.FSLogix Profile Size Warning.ps1
+	    
+    .NOTES
 	Execute as WEM external task (also after reconnect to refresh the information), logonscript or task at logon
-    Dennis Mohrmann, S&L Firmengruppe 12/2019
-    Modification History:
-    05/12/19	DM	Initial release
-	06/12/19	DM	Added FSLogix
-	09/12/19	DM	Added deviceTRUST
-	11/12/19	DM	Initial public release
-	11/12/19	DM	Changed method to get session id
-	18/06/20	DM  Added MTU Size, WEM and VDA Agent version
-	26/06/20	DM	Added FSLogix Version
-	26/06/20	DM	Changed BGInfo process handling
+	Edit the $BGInfoDir (Directory with BGInfo.exe) and $BGInfoFile (BGI file to load)
 #>
+
+# *******************
+# Scripts starts here
+# *******************
 
 # Source directory for BGInfo/BGInfo File (customize)
 $BGInfoDir = 'C:\Program Files (x86)\SuL\Citrix Management Tools\BGInfo'
@@ -26,7 +42,9 @@ $RegistryPath = "HKCU:\BGInfo"
 New-Item -Path $RegistryPath -EA SilentlyContinue
 
 
-# Citrix #
+# ***************************
+# Informations about Citrix #
+# ***************************
 
 # Citrix SessionID
 $CitrixSessionID = Get-ChildItem -Path "HKCU:\Volatile Environment" -Name
@@ -88,7 +106,9 @@ $WEMAgentLastRun = Get-EventLog -LogName 'WEM Agent Service' -Message '*Starting
 New-ItemProperty -Path $RegistryPath -Name "WEMAgentLastRun" -Value $WEMAgentLastRun -Force
 
 
-# FSLogix #
+# ****************************
+# Informations about FSLogix #
+# ****************************
 
 # Profilesize
 $ProfileSize = "{0:N2} GB" -f ((Get-ChildItem $ENV:USERPROFILE -Force -Recurse -EA SilentlyContinue | measure Length -s).Sum /1GB)
@@ -123,7 +143,7 @@ $FSLVersion = (Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\Cur
 New-ItemProperty -Path $RegistryPath -Name "FSL Version" -Value $FSLVersion -Force
 
 
-# BGInfo Tray icon
+# Execute BGInfo as Tray icon, if already executed end process before
 $BGInfoID = (Get-Process | Where-Object {$_.ProcessName -eq "BGInfo64" -and $_.SI -eq "$CitrixSessionID"}).Id
 Stop-Process -Id $BGInfoID -EA SilentlyContinue
 Start-Sleep -Seconds 1
