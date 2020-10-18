@@ -19,14 +19,14 @@
         Execute as logon script or WEM external task to show useful informations about the user environment
 		
     .EXAMPLE
-	WEM:
-	Path: powershell.exe
-	Arguments: -executionpolicy bypass -file "C:\Program Files (x86)\SuL\Citrix Management Tools\BGInfo\BGInfo.ps1"
-	.FSLogix Profile Size Warning.ps1
+		    WEM:
+		    Path: powershell.exe
+		    Arguments: -executionpolicy bypass -file "C:\Program Files (x86)\SuL\Citrix Management Tools\BGInfo\BGInfo.ps1"
+		    .FSLogix Profile Size Warning.ps1
 	    
     .NOTES
-	Execute as WEM external task (also after reconnect to refresh the information), logonscript or task at logon
-	Edit the $BGInfoDir (Directory with BGInfo.exe) and $BGInfoFile (BGI file to load)
+		    Execute as WEM external task (also after reconnect to refresh the information), logonscript or task at logon
+		    Edit the $BGInfoDir (Directory with BGInfo.exe) and $BGInfoFile (BGI file to load)
 #>
 
 # *******************
@@ -105,6 +105,15 @@ New-ItemProperty -Path $RegistryPath -Name "WEM Version" -Value $WEM -Force
 $WEMAgentLastRun = Get-EventLog -LogName 'WEM Agent Service' -Message '*Starting Logon Processing for User*' -Newest 1 |Select-Object -ExpandProperty TimeGenerated
 New-ItemProperty -Path $RegistryPath -Name "WEMAgentLastRun" -Value $WEMAgentLastRun -Force
 
+# WEM Cache
+$WEMCache = (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Norskale\Agent Host").AgentCacheAlternateLocation
+IF ($WEMCache -eq "")
+    {
+        $WEMCache = "${ENV:ProgramFiles(x86)}\Citrix\Workspace Environment Management Agent\Local Databases"
+    }
+$WEMCacheModified = (Get-Item "$WEMCache\LocalAgentCache.db").LastWriteTime.ToString("MM'/'dd'/'yyyy HH:mm:ss")
+New-ItemProperty -Path $RegistryPath -Name "WEMCacheModified" -Value $WEMCacheModified -Force
+
 
 # ****************************
 # Informations about FSLogix #
@@ -126,6 +135,11 @@ New-ItemProperty -Path $RegistryPath -Name "FSL Profile Size" -Value $FSLProfile
 $FSLProfileSizeRemaining = Get-Volume -FileSystemLabel *Profile-$ENV:USERNAME* | Where-Object { $_.DriveType -eq 'Fixed'} | ForEach-Object {[string]::Format("{0:0.00} GB", $_.SizeRemaining / 1GB)}
 New-ItemProperty -Path $RegistryPath -Name "FSL Profile Size Remaining" -Value $FSLProfileSizeRemaining -Force
 
+# FSLogix Profile size percent
+$FSLProfileSize = Get-Volume -FileSystemLabel *Profile-$ENV:USERNAME* | Where-Object { $_.DriveType -eq 'Fixed'}
+$FSLProfilePercentFree = [Math]::round((($FSLProfileSize.SizeRemaining/$FSLProfileSize.size) * 100))
+New-ItemProperty -Path $RegistryPath -Name "FSL Profile Size percent" -Value $FSLProfilePercentFree -Force
+
 # FSLogix O365 Status
 $FSLO365Status = Get-Volume -FriendlyName *O365-$ENV:USERNAME* | Where-Object { $_.DriveType -eq 'Fixed'} | Select-Object -ExpandProperty HealthStatus
 New-ItemProperty -Path $RegistryPath -Name "FSL O365 Status" -Value $FSLO365Status -Force
@@ -137,6 +151,11 @@ New-ItemProperty -Path $RegistryPath -Name "FSL O365 Size" -Value $FSLO365Size -
 # FSLogix O365 Size Remaining
 $FSLO365SizeRemaining = Get-Volume -FileSystemLabel *O365-$ENV:USERNAME* | Where-Object { $_.DriveType -eq 'Fixed'} | ForEach-Object {[string]::Format("{0:0.00} GB", $_.SizeRemaining / 1GB)}
 New-ItemProperty -Path $RegistryPath -Name "FSL O365 Size Remaining" -Value $FSLO365SizeRemaining -Force
+
+# FSLogix O365 size percent
+$FSLO365Size = Get-Volume -FileSystemLabel *O365-$ENV:USERNAME* | Where-Object { $_.DriveType -eq 'Fixed'}
+$FSLO365PercentFree = [Math]::round((($FSLO365Size.SizeRemaining/$FSLO365Size.size) * 100))
+New-ItemProperty -Path $RegistryPath -Name "FSL O365 Size percent" -Value $FSLO365PercentFree -Force
 
 # FSLogix Version
 $FSLVersion = (Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object {$_.DisplayName -eq "Microsoft FSLogix Apps"}).DisplayVersion
