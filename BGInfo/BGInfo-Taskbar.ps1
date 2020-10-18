@@ -19,14 +19,14 @@
         Execute as logon script or WEM external task to show useful informations about the user environment
 		
     .EXAMPLE
-		    WEM:
-		    Path: powershell.exe
-		    Arguments: -executionpolicy bypass -file "C:\Program Files (x86)\SuL\Citrix Management Tools\BGInfo\BGInfo-Taskbar-Taskbar.ps1"
-		    .FSLogix Profile Size Warning.ps1
+	WEM external task:
+	Path: powershell.exe
+	Arguments: -executionpolicy bypass -file "C:\Program Files (x86)\SuL\Citrix Management Tools\BGInfo\BGInfo-Taskbar-Taskbar.ps1"
+	.FSLogix Profile Size Warning.ps1
 	    
     .NOTES
-		    Execute as WEM external task (also after reconnect to refresh the information), logonscript or task at logon
-		    Edit the $BGInfoDir (Directory with BGInfo.exe) and $BGInfoFile (BGI file to load)
+	Execute as WEM external task (also after reconnect to refresh the information), logonscript or task at logon
+	Edit the $BGInfoDir (Directory with BGInfo.exe) and $BGInfoFile (BGI file to load)
 #>
 
 # *******************
@@ -112,7 +112,7 @@ IF ($WEMCache -eq "")
         $WEMCache = "${ENV:ProgramFiles(x86)}\Citrix\Workspace Environment Management Agent\Local Databases"
     }
 $WEMCacheModified = (Get-Item "$WEMCache\LocalAgentCache.db").LastWriteTime.ToString("MM'/'dd'/'yyyy HH:mm:ss")
-New-ItemProperty -Path $RegistryPath -Name "WEMCacheModified" -Value $WEMCacheModified -
+New-ItemProperty -Path $RegistryPath -Name "WEMCacheModified" -Value $WEMCacheModified -Force
 
 
 # ****************************
