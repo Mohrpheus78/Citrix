@@ -1,1 +1,1 @@
-Usefull scripts for Citrix environments
+Useful scripts for Citrix environments
