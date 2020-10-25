@@ -152,9 +152,9 @@ function vhdmount($v)
 	 Set-Partition -PartitionNumber $partition.PartitionNumber -DiskNumber $VHDNumber.Number -NewDriveLetter $FreeDriveLetter
 	 return "0"
 	 } catch
-	    {
-		 return "1"
-		}
+	 {
+	 return "1"
+	 }
 }
 # ========================================================================================================================================
 
@@ -163,11 +163,11 @@ function vhdmount($v)
 # ========================================================================================================================================
 function vhddismount($v)
 {
-    try
-    {
-     Dismount-DiskImage -ImagePath "$vdiskpath\$vhd" -ErrorAction stop
-     return "0"
-     } catch
+	try
+	{
+	 Dismount-DiskImage -ImagePath "$vdiskpath\$vhd" -ErrorAction stop
+     	 return "0"
+     	} catch
         {
          return "1"
         }
@@ -184,8 +184,8 @@ $adminRole=[System.Security.Principal.WindowsBuiltInRole]::Administrator
 if ($myWindowsPrincipal.IsInRole($adminRole))
    {
     # OK, runs as admin
-	Write-Verbose "OK, script is running with Admin rights" -Verbose
-	Write-Output ""
+    Write-Verbose "OK, script is running with Admin rights" -Verbose
+    Write-Output ""
    }
 
 else
@@ -199,16 +199,19 @@ else
 
 # Scriptblock for Defrag
 # ========================================================================================================================================
+# Get latest merged vDisk and vDisk Size
 $vhd = (Get-ChildItem "$vdiskpath" -Recurse | Where-Object {$_.fullname -like "*.vhdx"} | Sort-Object LastWriteTime -Descending | Select-Object -First 1).name
 $vhdsizebefore = (Get-ChildItem "$vdiskpath" -Recurse | Where-Object {$_.fullname -like "*.vhdx"} | Sort-Object LastWriteTime | Sort-Object -Descending  | Select-Object -First 1 @{n='Size';e={DisplayInBytes $_.length}}).Size
-$FreeDrive = Get-NextFreeDriveLetter # Get next free drive
+
+# Get next free drive
+$FreeDrive = Get-NextFreeDriveLetter 
 $FreeDriveLetter = $FreeDrive -replace ".$" # cut ":" 
 
 # Mounting vDisk
 $mount = vhdmount -v $vhd
 if ($mount -eq "1")
     {
-	 DS_WriteLog "E" "Mounting vDisk: $vhd failed" $LogFile
+     DS_WriteLog "E" "Mounting vDisk: $vhd failed" $LogFile
      Write-Output "Mounting vDisk: $vhd failed"
      break
     }
@@ -233,7 +236,7 @@ Start-Sleep 2
 $dismount = vhddismount -v $vhd
 if ($dismount -eq "1")
     {
-	 DS_WriteLog "E" "Failed to dismount vDisk: $vhd" $LogFile
+     DS_WriteLog "E" "Failed to dismount vDisk: $vhd" $LogFile
      Write-Output "Failed to dismount vDisk: $vhd"
      BREAK
     }
