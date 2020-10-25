@@ -12,6 +12,7 @@ https://www.citrix.com/blogs/2015/01/19/size-matters-pvs-ram-cache-overflow-sizi
 The script will first find out what the latest merged base disk is (VHDX)m after that the vDisk gets defragmented and shrinked.
 After the process you will see the vDisk size before and after shrinking.
 vDisk can't be in use!
+
 .PARAMETER vdiskpath
 -vdiskpath "Path to PVS vDisks"
 	
