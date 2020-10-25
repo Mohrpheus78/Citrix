@@ -1,4 +1,4 @@
-﻿# ****************************************************
+ # ****************************************************
 # D. Mohrmann, S&L Firmengruppe, Twitter: @mohrpheus78
 # Defrag and shrink PVS vDisk
 # ****************************************************
@@ -11,7 +11,6 @@ This script will defrag and shrink the latest merged base PVS vDisk
 The script will first find out what the latest merged base disk is (VHDX)m after that the vDisk gets defragmented and shrinked.
 After the process you will see the vDisk size before and after shrinking.
 vDisk can't be in use!
-
 .PARAMETER vdiskpath
 -vdiskpath "Path to PVS vDisks"
 	
@@ -110,16 +109,16 @@ function Get-NextFreeDriveLetter
         {
          foreach ($Drive in $Drives)
             {
-             if (-not(Test-Path -Path $Drive)){
-             return $Drive
-            }
+             if (-not(Test-Path -Path $Drive))
+                {
+                 return $Drive
+                }
+            }   
         }
- 
-    }
     else
-	{
-	 Write-Output $Drives | Where-Object {-not(Test-Path -Path $_)}
-	}
+	    {
+	     Write-Output $Drives | Where-Object {-not(Test-Path -Path $_)}
+	    }
 }
 # ========================================================================================================================================
 
@@ -151,7 +150,7 @@ function vhdmount($v)
 	 $partition = (Get-Partition -DiskNumber $VHDNumber.Number | Where-Object {$_.Type -eq "Basic" -or $_.Type -eq "IFS"})
 	 Set-Partition -PartitionNumber $partition.PartitionNumber -DiskNumber $VHDNumber.Number -NewDriveLetter $FreeDriveLetter
 	 return "0"
-	 } catch
+	} catch
 	 {
 	 return "1"
 	 }
@@ -166,11 +165,11 @@ function vhddismount($v)
 	try
 	{
 	 Dismount-DiskImage -ImagePath "$vdiskpath\$vhd" -ErrorAction stop
-     	 return "0"
-     	} catch
-        {
-         return "1"
-        }
+     return "0"
+    } catch
+     {
+      return "1"
+     }
 }
 # ========================================================================================================================================
 
