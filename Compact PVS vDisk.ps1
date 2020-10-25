@@ -5,7 +5,8 @@
 
 <#
 .SYNOPSIS
-This script will defrag and shrink the latest merged base PVS vDisk 
+This script will defrag and shrink the latest merged base PVS vDisk.
+https://www.citrix.com/blogs/2015/01/19/size-matters-pvs-ram-cache-overflow-sizing/?_ga=1.24764090.1091830672.1452712354
 	
 .DESCRIPTION
 The script will first find out what the latest merged base disk is (VHDX)m after that the vDisk gets defragmented and shrinked.
