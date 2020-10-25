@@ -117,9 +117,9 @@ function Get-NextFreeDriveLetter
  
     }
     else
-		{
-		 Write-Output $Drives | Where-Object {-not(Test-Path -Path $_)}
-		}
+	{
+	 Write-Output $Drives | Where-Object {-not(Test-Path -Path $_)}
+	}
 }
 # ========================================================================================================================================
 
