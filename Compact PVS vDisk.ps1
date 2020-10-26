@@ -1,4 +1,4 @@
- # ****************************************************
+# ****************************************************
 # D. Mohrmann, S&L Firmengruppe, Twitter: @mohrpheus78
 # Defrag and shrink PVS vDisk
 # ****************************************************
@@ -9,26 +9,25 @@ This script will defrag and shrink the latest merged base PVS vDisk.
 https://www.citrix.com/blogs/2015/01/19/size-matters-pvs-ram-cache-overflow-sizing/?_ga=1.24764090.1091830672.1452712354
 	
 .DESCRIPTION
-The script will first find out what the latest merged base disk is (VHDX)m after that the vDisk gets defragmented and shrinked.
-After the process you will see the vDisk size before and after shrinking.
-vDisk can't be in use!
+The script will first find out what the latest merged base disk is (VHDX). After that the vDisk gets defragmented and shrinked.
+At the end you will see the vDisk size before and after shrinking.
+vDisk can't be in use while executing the script!
 
 .PARAMETER vdiskpath
 -vdiskpath "Path to PVS vDisks"
 	
 .EXAMPLE
-."Compact PVS vDisk" -vdiskpath "D:\vDisks\CVAD"
+."Compact PVS vDisk.ps1" -vdiskpath "D:\vDisks\CVAD"
     
 .NOTES
-Run after you create a new merged base disk that isn't in use yet.
-Run as administrator!
+Run as administrator after you create a new merged base disk that isn't in use yet.
 #>
 
 [CmdletBinding()]
 
 param
     (
-	 # Path to PVS VHDX files
+     # Path to PVS VHDX files
      [Parameter(Mandatory = $true)]
      [ValidateNotNull()]
      [ValidateNotNullOrEmpty()]
@@ -47,24 +46,24 @@ function DS_WriteLog
 		)
  
     begin
-	{
+    {
     }
  
     process
-	{
+    {
      $DateTime = (Get-Date -format dd-MM-yyyy) + " " + (Get-Date -format HH:mm:ss)
-         if ( $Text -eq "" )
-			{
-             Add-Content $LogFile -value ("") # Write an empty line
-			}
-		Else
-			{
-			 Add-Content $LogFile -value ($DateTime + " " + $InformationType.ToUpper() + " - " + $Text)
-			}
+     if ( $Text -eq "" )
+     	{
+         Add-Content $LogFile -value ("") # Write an empty line
+	}
+     Else
+	{
+	 Add-Content $LogFile -value ($DateTime + " " + $InformationType.ToUpper() + " - " + $Text)
+	}
     }
  
     end
-	{
+    {
     }
 }
 
@@ -167,11 +166,11 @@ function vhddismount($v)
 	try
 	{
 	 Dismount-DiskImage -ImagePath "$vdiskpath\$vhd" -ErrorAction stop
-     return "0"
-    } catch
-     {
-      return "1"
-     }
+     	 return "0"
+    	} catch
+     	 {
+      	  return "1"
+     	 }
 }
 # ========================================================================================================================================
 
@@ -191,14 +190,14 @@ if ($myWindowsPrincipal.IsInRole($adminRole))
 
 else
    {
-    # Script doesn't run as admin, run new process object to execute PowerShell
+    # Script doesn't run as admin, stop!
     Write-Verbose "Error! Script is NOT running with Admin rights!" -Verbose
     BREAK
    }
 # ========================================================================================================================================
 
 
-# Scriptblock for Defrag
+# Scriptblock for defragmenting the PVS vDisk
 # ========================================================================================================================================
 # Get latest merged vDisk and vDisk Size
 $vhd = (Get-ChildItem "$vdiskpath" -Recurse | Where-Object {$_.fullname -like "*.vhdx"} | Sort-Object LastWriteTime -Descending | Select-Object -First 1).name
@@ -221,17 +220,17 @@ Write-Output "Mounting vDisk: $vhd"
 Write-Output ""
 
 # Defrag
-Start-Sleep 2
 DS_WriteLog "I" "Running defrag on vDisk: $vhd" $LogFile
 Write-Output "Running defrag on vDisk: $vhd"
 try {
+Start-Sleep 3
 Start-Process "defrag.exe" -ArgumentList "$FreeDrive /H /U /V"
+Start-Sleep 3
 } catch {
 DS_WriteLog "E" "An error occured while running defrag (error: $($Error[0]))" $LogFile       
 }
 DS_WriteLog "-" "" $LogFile
 Write-Output ""
-Start-Sleep 2
 
 # Dismounting vDisk
 $dismount = vhddismount -v $vhd
@@ -291,8 +290,8 @@ $diskpartcommand | cmd.exe | Out-Null
 DS_WriteLog "E" "An error occured while shrinking vDisk: $vhd (error: $($Error[0]))" $LogFile       
 }
 
-# Compare size
+# Compare PVS vDisk size
 $vhdsizeafter = (Get-ChildItem "$vdiskpath" -Recurse | Where-Object {$_.fullname -like "*.vhdx"} | Sort-Object LastWriteTime | Sort-Object -Descending  | Select-Object -First 1 @{n='Size';e={DisplayInBytes $_.length}}).Size
-DS_WriteLog "I" "Size of vDisk: $vhd before shrinking: $vhdsizebefore - after shrinking: $vhdsizeafter" $LogFile
-Write-Output "Size of vDisk: $vhd before shrinking: $vhdsizebefore - after shrinking: $vhdsizeafter"
+DS_WriteLog "I" "Size of vDisk: $vhd before shrinking: $vhdsizebefore - Size of vDisk: $vhd after shrinking: $vhdsizeafter" $LogFile
+Write-Output "Size of vDisk: $vhd before shrinking: $vhdsizebefore - Size of vDisk: $vhd after shrinking: $vhdsizeafter"
 # ========================================================================================================================================
