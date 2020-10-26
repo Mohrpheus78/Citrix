@@ -23,6 +23,7 @@ vDisk can't be in use while executing the script!
 Run as administrator after you create a new merged base disk that isn't in use yet.
 #>
 
+
 [CmdletBinding()]
 
 param
