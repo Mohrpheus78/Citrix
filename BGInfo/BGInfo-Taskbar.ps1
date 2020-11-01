@@ -10,6 +10,7 @@
 # 26/06/20	DM	Added FSLogix Version
 # 26/06/20	DM	Changed BGInfo process handling
 # 20/10/20	DM	Added percent for FSL
+# 21/10/20	DM	Added WEM Cache date
 # *******************************************************
 
 <#
