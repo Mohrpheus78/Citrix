@@ -21,6 +21,7 @@ vDisk can't be in use while executing the script!
     
 .NOTES
 Run as administrator after you create a new merged base disk that isn't in use yet.
+Tested with UEFI partitions and standard partititions without system reserved partition
 #>
 
 
