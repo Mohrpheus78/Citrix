@@ -21,7 +21,9 @@ vDisk can't be in use while executing the script!
     
 .NOTES
 Run as administrator after you create a new merged base disk that isn't in use yet.
-Tested with UEFI partitions and standard partititions without system reserved partition
+Tested with UEFI partitions and standard partititions without system reserved partition.
+Sometimes the "detach disk" command from diskpart doesn't work as expected, so the vDisk is still mounted, so the dismount command runs again
+after diskpart
 #>
 
 
@@ -287,10 +289,22 @@ DS_WriteLog "I" "Shrinking vDisk: $vhd" $LogFile
 Write-Output "Shrinking vDisk: $vhd"
 Write-Output ""
 try {
-$diskpartcommand | cmd.exe | Out-Null
+$diskpartcommand | cmd.exe 
 } catch {
 DS_WriteLog "E" "An error occured while shrinking vDisk: $vhd (error: $($Error[0]))" $LogFile       
 }
+
+# Dismounting vDisk after shrinking if diskpart can't detach the vDisk
+$dismount = vhddismount -v $vhd
+if ($dismount -eq "1")
+    {
+     DS_WriteLog "E" "Failed to dismount vDisk: $vhd" $LogFile
+     Write-Output "Failed to dismount vDisk: $vhd"
+     BREAK
+    }
+DS_WriteLog "I" "Dismounting vDisk: $vhd" $LogFile
+Write-Output "Dismounting vDisk: $vhd"
+Write-Output ""
 
 # Compare PVS vDisk size
 $vhdsizeafter = (Get-ChildItem "$vdiskpath" -Recurse | Where-Object {$_.fullname -like "*.vhdx"} | Sort-Object LastWriteTime | Sort-Object -Descending  | Select-Object -First 1 @{n='Size';e={DisplayInBytes $_.length}}).Size
