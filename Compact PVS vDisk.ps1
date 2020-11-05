@@ -226,7 +226,7 @@ DS_WriteLog "I" "Running defrag on vDisk: $vhd" $LogFile
 Write-Output "Running defrag on vDisk: $vhd"
 try {
 Start-Sleep 3
-Start-Process "defrag.exe" -ArgumentList "$FreeDrive /H /U /V"
+Start-Process "defrag.exe" -ArgumentList "$FreeDrive /X /G /H /U /V" -wait
 Start-Sleep 3
 } catch {
 DS_WriteLog "E" "An error occured while running defrag (error: $($Error[0]))" $LogFile       
