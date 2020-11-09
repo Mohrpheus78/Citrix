@@ -1,4 +1,4 @@
-# *******************************************************
+# ***********************************************************************************************
 # D. Mohrmann, S&L Firmengruppe, Twitter: @mohrpheus78
 # BGInfo powered by Powershell
 # 05/12/19	DM	Initial release
@@ -11,7 +11,8 @@
 # 26/06/20	DM	Changed BGInfo process handling
 # 20/10/20	DM	Added percent for FSL
 # 21/10/20	DM	Added WEM Cache date
-# *******************************************************
+# 09/11/20  DM  Added Regkeys for IP and DNS (Standard method didn't work wirh Citrix Hypervisor)
+# ***********************************************************************************************
 
 <#
     .SYNOPSIS
