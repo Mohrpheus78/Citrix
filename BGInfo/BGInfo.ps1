@@ -50,7 +50,7 @@ New-Item -Path $RegistryPath -EA SilentlyContinue
 # ********************
 $IPAddress = (Get-NetIPConfiguration | Where-Object {$_.IPv4DefaultGateway -ne $null -and $_.NetAdapter.status -ne "Disconnected"}).IPv4Address.IPAddress
 New-ItemProperty -Path $RegistryPath -Name "IPAddress" -Value $IPAddress -Force
-$DNSServer = (Get-WmiObject Win32_NetworkAdapterConfiguration | where {$_.DefaultIPGateway -ne $null}).DNSServerSearchOrder
+$DNSServer = (Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.DefaultIPGateway -ne $null}).DNSServerSearchOrder
 New-ItemProperty -Path $RegistryPath -Name "DNSServer" -Value $DNSServer -Force
 
 
