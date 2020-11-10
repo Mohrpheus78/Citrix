@@ -5,5 +5,4 @@ The purpose of the scripts is to determine values, e.g. the size of the FSLogix 
 You can of course adapt and expand the scripts. The path to the files must be adapted in the scripts.
 You can display the information as a background image or as a tray icon in the systray which is displayed when required. The parameters for this differ in the two scripts.
 
-![]
-(https://github.com/Mohrpheus78/Citrix/blob/main/BGInfo/Images/BGInfo-Taskbar.png)
+![1](https://github.com/Mohrpheus78/Citrix/blob/main/BGInfo/Images/BGInfo-Taskbar.png)
