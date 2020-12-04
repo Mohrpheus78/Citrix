@@ -6,12 +6,12 @@
 # 09/12/19	DM	Added deviceTRUST
 # 11/12/19	DM	Initial public release
 # 11/12/19	DM	Changed method to get session id
-# 18/06/20	DM  	Added MTU Size, WEM and VDA Agent version
+# 18/06/20	DM  Added MTU Size, WEM and VDA Agent version
 # 26/06/20	DM	Added FSLogix Version
 # 26/06/20	DM	Changed BGInfo process handling
 # 20/10/20	DM	Added percent for FSL
 # 21/10/20	DM	Added WEM Cache date
-# 09/11/20  	DM  	Added Regkeys for IP and DNS (Standard method didn't work wirh Citrix Hypervisor)
+# 09/11/20  DM  Added Regkeys for IP and DNS (Standard method didn't work wirh Citrix Hypervisor)
 # *******************************************************************************************************
 
 <#
