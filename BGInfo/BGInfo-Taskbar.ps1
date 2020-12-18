@@ -12,24 +12,24 @@
 # 20/10/20	DM	Added percent for FSL
 # 21/10/20	DM	Added WEM Cache date
 # 09/11/20  DM  Added Regkeys for IP and DNS (Standard method didn't work wirh Citrix Hypervisor)
+# 18/12/20	DM	Added GPU Infos and Citrix Rendezvous protocol
 # *******************************************************************************************************
 
 <#
-    .SYNOPSIS
-        Shows information about the user Citrix environment as BGInfo taskbar icon
+.SYNOPSIS
+Shows information about the user Citrix environment as BGInfo taskbar icon
 		
-    .Description
-        Execute as logon script or WEM external task to show useful informations about the user environment
+.Description
+Execute as logon script or WEM external task to show useful informations about the user environment
 		
-    .EXAMPLE
-	WEM external task:
-	Path: powershell.exe
-	Arguments: -executionpolicy bypass -file "C:\Program Files (x86)\SuL\Citrix Management Tools\BGInfo\BGInfo-Taskbar-Taskbar.ps1"
-	.FSLogix Profile Size Warning.ps1
+.EXAMPLE
+WEM external task:
+Path: powershell.exe
+Arguments: -executionpolicy bypass -file "C:\Program Files (x86)\SuL\Citrix Management Tools\BGInfo\BGInfo-Taskbar-Taskbar.ps1"
 	    
-    .NOTES
-	Execute as WEM external task (also after reconnect to refresh the information), logonscript or task at logon
-	Edit the $BGInfoDir (Directory with BGInfo.exe) and $BGInfoFile (BGI file to load)
+.NOTES
+Execute as WEM external task (also after reconnect to refresh the information), logonscript or task at logon
+Edit the $BGInfoDir (Directory with BGInfo.exe) and $BGInfoFile (BGI file to load)
 #>
 
 # *******************
@@ -77,6 +77,14 @@ New-ItemProperty -Path $RegistryPath -Name "Citrix Client IP" -Value $CitrixClie
 # HDX Protocol
 $HDXProtocol = Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_Network_Enum | Where-Object {$_.SessionID -eq $CitrixSessionID} | Select-Object -ExpandProperty Component_Protocol
 New-ItemProperty -Path $RegistryPath -Name "HDX Protocol" -Value $HDXProtocol -Force
+IF ($HDXProtocol -eq "UDP-DTLS-CGP-ICA")
+	{
+	 New-ItemProperty -Path $RegistryPath -Name "Rendezvous" -Value Yes -Force
+	}
+ELSE 
+	{
+	 New-ItemProperty -Path $RegistryPath -Name "Rendezvous" -Value No -Force
+	}
 
 # HDX Video Codec
 $HDXCodec = Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_VirtualChannel_Thinwire_Enum | Where-Object {$_.SessionID -eq $CitrixSessionID} | Select-Object -ExpandProperty Component_VideoCodecUse
@@ -172,6 +180,37 @@ New-ItemProperty -Path $RegistryPath -Name "FSL O365 Size percent" -Value $FSLO3
 # FSLogix Version
 $FSLVersion = (Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object {$_.DisplayName -eq "Microsoft FSLogix Apps"}).DisplayVersion
 New-ItemProperty -Path $RegistryPath -Name "FSL Version" -Value $FSLVersion -Force
+
+
+# ************************
+# Informations about GPU #
+# ************************
+
+# GPU
+$GPU = (Get-WmiObject win32_videocontroller).Name
+New-ItemProperty -Path $RegistryPath -Name "GPU" -Value $GPU -Force
+
+# Hardware Encoder
+$HardwareEncoder = (Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_VirtualChannel_Thinwire_Base | Where-Object {$_.SessionID -eq $CitrixSessionID}).Component_Monitor_HardwareEncodeInUse | Select-Object -First 1
+IF ($HardwareEncoder -eq "True")
+    {
+        New-ItemProperty -Path $RegistryPath -Name "HW Encoder" -Value Yes -Force
+	}
+ELSE 
+	{
+        New-ItemProperty -Path $RegistryPath -Name "HW Encoder" -Value No -Force
+	}
+	
+# HDX 3D
+$HDX3D = (Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_VirtualChannel_Thinwire_Base | Where-Object {$_.SessionID -eq $CitrixSessionID}).Component_HDX3DPro | Select-Object -First 1
+IF ($HDX3D -eq "True")
+    {
+        New-ItemProperty -Path $RegistryPath -Name "HDX3D" -Value Yes -Force
+	}
+ELSE 
+	{
+        New-ItemProperty -Path $RegistryPath -Name "HDX3D" -Value No -Force
+	}
 
 
 # Execute BGInfo as Tray icon, if already executed end process before
