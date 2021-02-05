@@ -11,10 +11,10 @@ that BIS-F personalizationis ready. Use with Base Image Script Framework, place 
 "C:\Program Files (x86)\Base Image Script Framework (BIS-F)\Framework\SubCall\Personalization\Custom"
 	
 .DESCRIPTION
-The script will first find out what locale settings the user has configured and than show the toast notification.
+The script will first find out what locale settings the user has configured and then show the toast notification.
    
 .NOTES
-This script is part of the script "BIS-F Personalization ready.ps1" that calls this one.
+This script is part of the script "BIS-F Personalization ready.ps1" that calls this script.
 Attention: Requires the BurntToast Powershell Module! https://github.com/Windos/BurntToast or use without BurntToast! (Uncomment from line 33)
 #>
 
@@ -45,4 +45,3 @@ $balloon.BalloonTipTitle = "Base Image Script Framework"
 $balloon.Visible = $true 
 $balloon.ShowBalloonTip(15000) # adjust sec.
 #>
-

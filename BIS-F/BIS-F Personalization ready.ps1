@@ -8,7 +8,7 @@
 .SYNOPSIS
 This script will get the session ID of the currently logged in user and calls another script in the context of this user, to show a
 toast notification that BIS-F personalizationis ready. Use with Base Image Script Framework, place the script in the folder
-"C:\Program Files (x86)\Base Image Script Framework (BIS-F)\Framework\SubCall\Personalization\Custom", it be launched by the BIS-F scheduled task at logon
+"C:\Program Files (x86)\Base Image Script Framework (BIS-F)\Framework\SubCall\Personalization\Custom", it will be launched by the BIS-F scheduled task at logon
 
 .DESCRIPTION
 The script will first find out what locale settings the user has configured and then show the toast notification
