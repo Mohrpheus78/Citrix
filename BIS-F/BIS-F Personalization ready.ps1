@@ -32,7 +32,7 @@ Function Get-TSSessions {
 }
 
 # Get session ID
-$SessionID = (Get-TSSessions | Where-Object "STATE" -EQ "Active").ID
+$SessionID = (Get-TSSessions | Where-Object "SESSIONNAME" -like ">rdp*").ID
 
 # Lauch psexec in the context of the user to show the toast notification
 .$psexeclocation\PsExec.exe -accepteula -s -i $SessionID powershell.exe -Executionpolicy bypass -file "${env:ProgramFiles(x86)}\Base Image Script Framework (BIS-F)\Framework\SubCall\Personalization\Custom\SubCall\BIS-F toast notification.ps1"
