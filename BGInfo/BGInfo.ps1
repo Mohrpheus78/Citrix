@@ -144,7 +144,7 @@ $ProfileSize = "{0:N2} GB" -f ((Get-ChildItem $ENV:USERPROFILE -Force -Recurse -
 New-ItemProperty -Path $RegistryPath -Name "Profile Size" -Value $ProfileSize -Force
 
 # FSLogix Profile Status
-$FSLProfileStatus = Get-Volume -FriendlyName *Profile-$ENV:USERNAME* | Where-Object { $_.DriveType -eq 'Fixed'} | Select-Object -ExpandProperty HealthStatus
+$FSLProfileStatus = Get-Volume -FileSystemLabel *Profile-$ENV:USERNAME* | Where-Object { $_.DriveType -eq 'Fixed'} | Select-Object -ExpandProperty HealthStatus
 New-ItemProperty -Path $RegistryPath -Name "FSL Profile Status" -Value $FSLProfileStatus -Force
 
 # FSLogix Profile Size
@@ -161,7 +161,7 @@ $FSLProfilePercentFree = [Math]::round((($FSLProfileSize.SizeRemaining/$FSLProfi
 New-ItemProperty -Path $RegistryPath -Name "FSL Profile Size percent" -Value $FSLProfilePercentFree -Force
 
 # FSLogix O365 Status
-$FSLO365Status = Get-Volume -FriendlyName *O365-$ENV:USERNAME* | Where-Object { $_.DriveType -eq 'Fixed'} | Select-Object -ExpandProperty HealthStatus
+$FSLO365Status = Get-Volume -FileSystemLabel *O365-$ENV:USERNAME* | Where-Object { $_.DriveType -eq 'Fixed'} | Select-Object -ExpandProperty HealthStatus
 New-ItemProperty -Path $RegistryPath -Name "FSL O365 Status" -Value $FSLO365Status -Force
 
 # FSLogix O365 Size
