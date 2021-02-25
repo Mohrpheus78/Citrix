@@ -6,7 +6,7 @@
 
 <#
 .SYNOPSIS
-This script will get the session ID of the currently logged in RDP Admin and calls another script in the context of this user, to show a
+This script will get the session ID of the currently logged in user and calls another script in the context of this user, to show a
 toast notification that BIS-F personalizationis ready. Use with Base Image Script Framework, place the script in the folder
 "C:\Program Files (x86)\Base Image Script Framework (BIS-F)\Framework\SubCall\Personalization\Custom", it will be launched by the BIS-F scheduled task at logon
 
@@ -18,21 +18,23 @@ Edit the PSexec installation path
 #>
 
 # psexec location
-$psexeclocation = "${env:ProgramFiles(x86)}\Sysinternals"
+$psexec = "${env:ProgramFiles(x86)}\Sysinternals\psexec.exe"
 
 # Function to get the active user session
 Function Get-TSSessions {
     qwinsta |
     #Parse output
     ForEach-Object {
-    $_.Trim() -replace "\s+",","
-    } |
+    $_.Trim() -replace "\s+",","} |
     #Convert to objects
     ConvertFrom-Csv
 }
 
-# Get session ID
-$SessionID = (Get-TSSessions | Where-Object "SESSIONNAME" -like ">rdp*").ID
+# Get session ID Console
+#$SessionID = (Get-TSSessions | Where-Object {$_.STATE -eq "Active" -and $_.SESSIONNAME -eq ">console"}).Id
+# Get session ID RDP
+#$SessionID = (Get-TSSessions | Where-Object {$_.STATE -eq "Active" -and $_.SESSIONNAME -like ">rdp*"}).Id
+$SessionID = (Get-TSSessions | Where-Object "STATE" -EQ "Active").ID
 
 # Lauch psexec in the context of the user to show the toast notification
-.$psexeclocation\PsExec.exe -accepteula -s -i $SessionID powershell.exe -Executionpolicy bypass -file "${env:ProgramFiles(x86)}\Base Image Script Framework (BIS-F)\Framework\SubCall\Personalization\Custom\SubCall\BIS-F toast notification.ps1"
+.$psexec -accepteula -s -i $SessionID powershell.exe -Executionpolicy bypass -file "${env:ProgramFiles(x86)}\Base Image Script Framework (BIS-F)\Framework\SubCall\Personalization\Custom\SubCall\BIS-F toast notification.ps1"
