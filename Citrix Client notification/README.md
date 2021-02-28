@@ -1,14 +1,13 @@
 # Citrix client checker
 First of all, I'm no powershell expert, so I'm sure there is room for improvements!
 
-This script will check which Citrix client is installed on the endpoint (Platform and version). You define a minimum client version and if the clients endpoint version is lower, the user gets
-a toast notificaton that the client is out of date (or whatever you want). You can also inform the user that a HTML5 isn't supported.
-The script will first find the current session id of the user and what client platform/version is used inside this session. The display language is determined to display
-the notification in the correct language. The toast notification appears longer than the default vaulue (line 83). You can also change this value to "Short".
+This script will check which Citrix client is installed on the endpoint (Platform and version). You define a minimum client version and if the clients endpoint version is lower, the user gets a toast notificaton that the client is out of date (or whatever you want). You can also inform the user that a HTML5 isn't supported.The script will first find the current session id of the user and what client platform/version is used inside this session. The display language is determined to display the notification in the correct language. The toast notification appears longer than the default vaulue (line 83). You can also change this value to "Short".
 
 ## How To
+```
 Attention: Requires the BurntToast Powershell Module! https://github.com/Windos/BurntToast
 Use "Install-Module -Name BurntToast" to install the module on your Citrix VDA.
+```
 BurntToast needs an AppId to display the notifications, default is Windows Powershell. BurntToast will check the start menu for the shortcut, no message is shown if Powershell cannot be found.
 The script runs in the user context and in many cases admins hide the Powershell shortcuts from the start menu, so you have to define your own AppId.
 To define you own AppId you have to place a shortcut in the start menu and use this as your AppId. (e.g. a png file). The name of the AppId will be displayed at the bottom of the notification.
