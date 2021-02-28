@@ -60,16 +60,16 @@ Of course there are more version, these are examples!
 You can also change the language with the $Language variable. 
 
 ## Example
-- Powershell logonscript:  
+- Powershell logonscript  
 Script Name:  
 C:\Program Files (x86)\SuL\Scripts\Notifications\Citrix Client notification.ps1  
 Script parameters:  
 -WindowsClientMin "20.12.1.42" -MacClientMin "20.12.0.3"  
 
-- WEM external task:  
+- WEM external task  
 Path: powershell.exe  
 Arguments:  
 -executionpolicy bypass -file "C:\Program Files (x86)\Scripts\Citrix Client notification.ps1"  
 
 ## Logging
-A log for each client gets written to the "Logging" folder (which must exist!)
+A log for each client gets written to the "Logging" folder (which must exist!). The log file will be overwritten.
