@@ -19,8 +19,7 @@ To find out how to define the AppID, run
 ```
 Get-StartApps
 ```
-You get a list of possible values.  
-here you get more informatiosn about the AppID:  
+You get a list of possible values. Here you get more informatiosn about the AppID:  
 https://docs.microsoft.com/en-us/windows/win32/shell/appids  
 https://toastit.dev/2018/02/04/burnttoast-appid-installer/  
 
@@ -57,17 +56,17 @@ Of course there are more version, these are examples!
 - $BTAppIcon defines the icon that will be used for the notification.
 - $BTAppID defines the AppID (must be present in the users start menu). You can use a dummy, but make sure you place a shortcut in the start menu first.
 - $BTAudio defines the sound (https://docs.microsoft.com/en-us/uwp/schemas/tiles/toastschema/element-audio)
-Of course you can change the notification text, just change the $BTText1, $BTText2 and $BTText3 variables. 
+- Of course you can change the notification text, just change the $BTText1, $BTText2 and $BTText3 variables. 
 You can also change the language with the $Language variable. 
 
 ## Example
-- Powershell logonscript:
+- Powershell logonscript:  
 Script Name:  
 C:\Program Files (x86)\SuL\Scripts\Notifications\Citrix Client notification.ps1  
 Script parameters:  
 -WindowsClientMin "20.12.1.42" -MacClientMin "20.12.0.3"  
 
-- WEM external task:
+- WEM external task:  
 Path: powershell.exe  
 Arguments:  
 -executionpolicy bypass -file "C:\Program Files (x86)\Scripts\Citrix Client notification.ps1"  
