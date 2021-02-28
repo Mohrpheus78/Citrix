@@ -47,8 +47,8 @@ Mac client versions: 20.07.0.6 (2007), 20.08.0.3 (2008), 20.9.0.17 (2009), 20.10
 Linux client versions: 20.9.0.15 (2009), 20.10.0.6 (2010), 20.12.0.12 (2012), 21.1.0.14 (2101)
 
 Version:		1.0
-Author:         Dennis Mohrmann <@mohrpheus78>
-Creation Date:  2021-02-19
+Author:         	Dennis Mohrmann <@mohrpheus78>
+Creation Date:  	2021-02-19
 Purpose/Change:	
 2021-02-20		Inital version
 2021-02-21		Added Language, Added BurntToast text
