@@ -85,11 +85,11 @@ Param(
 begin {}
  
 process {
-		 if ( $Text -eq "" ) {
+		if ( $Text -eq "" ) {
 			Add-Content $LogFile -value ("") # Write an empty line
-        } Else {
+        	} Else {
 			Add-Content $LogFile -value ($Text)
-        }
+        	}
 	}
 
 end {}
@@ -115,24 +115,24 @@ $BTAppIcon = New-BTImage -Source "$PSScriptRoot\CWA.png" -AppLogoOverride
 $BTAppId = "{7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}\SuL\Scripts\Notifications\CWA.png"
 $BTAudio = New-BTAudio -Source ms-winsoundevent:Notification.IM
 if ($Language -eq "de-DE") {
-		$BTText1 = New-BTText -Text "Ihr Citrix Client ist nicht aktuell!"
+	$BTText1 = New-BTText -Text "Ihr Citrix Client ist nicht aktuell!"
         $BTText2 = New-BTText -Text "$ClientPlatform Client Version $CitrixClientVersion."
         $BTText3 = New-BTText -Text "Sie finden den aktuellen Client unter https://workspace.app"
 	}
 	else {
-		$BTText1 = New-BTText -Text "Your Citrix Client is out of date!"
+	$BTText1 = New-BTText -Text "Your Citrix Client is out of date!"
         $BTText2 = New-BTText -Text "$ClientPlatform Client Version $CitrixClientVersion."
         $BTText3 = New-BTText -Text "You find the current client on https://workspace.app"
 	}
 		
 if ($ClientPlatform -eq "HTML5") {
 	if ($Language -eq "de-DE") {
-		$BTText1 = New-BTText -Text "Sie benutzen den Citrix HTML client!"
+	$BTText1 = New-BTText -Text "Sie benutzen den Citrix HTML client!"
         $BTText2 = New-BTText -Text "Bitte einen vollwertigen Citrix Client installieren."
         $BTText3 = New-BTText -Text "Sie finden einen aktuellen Client unter https://workspace.app"
 	}
 	else {
-		$BTText1 = New-BTText -Text "You use the Citrix HTML client!"
+	$BTText1 = New-BTText -Text "You use the Citrix HTML client!"
         $BTText2 = New-BTText -Text "Please install a suitable client for your device."
         $BTText3 = New-BTText -Text "You find a current client on https://workspace.app"
 	}
@@ -162,7 +162,7 @@ WriteLog "Platform: $ClientPlatform" $LogFile
 WriteLog "Minimum client version: $WindowsClientMin" $LogFile
 WriteLog "Current client version: $CitrixClientVersion" $LogFile
 	if ($CitrixClientVersion -lt $WindowsClientMin) {
-		Submit-BTNotification -Content $BTContent -AppId $BTAppId
+	Submit-BTNotification -Content $BTContent -AppId $BTAppId
 	}
 }
 
@@ -172,7 +172,7 @@ WriteLog "Platform: $ClientPlatform" $LogFile
 WriteLog "Minimum client version: $MacClientMin" $LogFile
 WriteLog "Current client version: $CitrixClientVersion" $LogFile
 	if ($CitrixClientVersion -lt $MacClientMin) {
-		Submit-BTNotification -Content $BTContent -AppId $BTAppId
+	Submit-BTNotification -Content $BTContent -AppId $BTAppId
 	}
 }
 
@@ -182,6 +182,6 @@ WriteLog "Platform: $ClientPlatform" $LogFile
 WriteLog "Minimum client version: $LinuxClientMin" $LogFile
 WriteLog "Current client version: $CitrixClientVersion" $LogFile
 	if ($CitrixClientVersion -lt $LinuxClientMin) {
-		Submit-BTNotification -Content $BTContent -AppId $BTAppId
+	Submit-BTNotification -Content $BTContent -AppId $BTAppId
 	}
 }
