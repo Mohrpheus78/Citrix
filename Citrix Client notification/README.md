@@ -62,7 +62,7 @@ You can also change the language with the $Language variable.
 ## Execution
 - Powershell logonscript  
 Script Name:  
-C:\Program Files (x86)\SuL\Scripts\Notifications\Citrix Client notification.ps1  
+C:\Program Files (x86)\Scripts\Notifications\Citrix Client notification.ps1  
 Script parameters:  
 -WindowsClientMin "20.12.1.42" -MacClientMin "20.12.0.3"  
 
