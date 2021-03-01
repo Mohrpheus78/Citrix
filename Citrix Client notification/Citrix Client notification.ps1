@@ -43,7 +43,7 @@ Run the script as a logon script or with Citrix WEM external task.
 
 Windows client CR versions: 20.9.6.34 (2009.6), 20.10.0.20 (2010), 20.12.0.39 (2012), 20.12.1.42 (2012.1), 21.02.0.25 (2102)
 Windows client LTSR version: 19.12.3000.6 (19.12.3000.6)
-Mac client versions: 20.07.0.6 (2007), 20.08.0.3 (2008), 20.9.0.17 (2009), 20.10.0.16 (2010), 20.12.0.3 (2012), 21.01.0.21 (2101)
+Mac client versions: 20.07.0.6 (2007), 20.08.0.3 (2008), 20.9.0.17 (2009), 20.10.0.16 (2010), 20.12.0.3 (2012), 21.02.0.29 (2102)
 Linux client versions: 20.9.0.15 (2009), 20.10.0.6 (2010), 20.12.0.12 (2012), 21.1.0.14 (2101)
 
 Version:		1.0
@@ -66,7 +66,7 @@ param(
 	       
       [Parameter(
 	  Mandatory = $false)]  
-      [version]$MacClientMin = "21.01.0.21", # define minimum client version here
+      [version]$MacClientMin = "21.02.0.29", # define minimum client version here
 	  
 	  [Parameter(
 	  Mandatory = $false)]  
