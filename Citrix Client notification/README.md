@@ -76,4 +76,4 @@ A log for each client gets written to the "Logging" folder (which must exist!). 
 
 ## Example
 ![HTML client](https://github.com/Mohrpheus78/Citrix/tree/main/Citrix%20Client%20notification/Images/HTML.png)
-!MAC client](https://github.com/Mohrpheus78/Citrix/tree/main/Citrix%20Client%20notification/Images/Mac.png)
+![MAC client](https://github.com/Mohrpheus78/Citrix/tree/main/Citrix%20Client%20notification/Images/Mac.png)
