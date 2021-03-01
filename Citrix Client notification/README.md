@@ -59,7 +59,7 @@ Of course there are more version, these are examples!
 - Of course you can change the notification text, just change the $BTText1, $BTText2 and $BTText3 variables. 
 You can also change the language with the $Language variable. 
 
-## Example
+## Execution
 - Powershell logonscript  
 Script Name:  
 C:\Program Files (x86)\SuL\Scripts\Notifications\Citrix Client notification.ps1  
@@ -73,3 +73,7 @@ Arguments:
 
 ## Logging
 A log for each client gets written to the "Logging" folder (which must exist!). The log file will be overwritten.
+
+## Example
+![HTML client](https://github.com/Mohrpheus78/Citrix/blob/main/Citrix Client notification/Images/HTML.png)
+!MAC client](https://github.com/Mohrpheus78/Citrix/blob/main/Citrix Client notification/Images/Mac.png)
