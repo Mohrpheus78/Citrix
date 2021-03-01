@@ -75,5 +75,5 @@ Arguments:
 A log for each client gets written to the "Logging" folder (which must exist!). The log file will be overwritten.
 
 ## Example
-![HTML client](https://github.com/Mohrpheus78/Citrix/tree/main/Citrix%20Client%20notification/Images/HTML.png)
-![MAC client](https://github.com/Mohrpheus78/Citrix/tree/main/Citrix%20Client%20notification/Images/Mac.png)
+![HTML client](https://github.com/Mohrpheus78/Citrix/blob/main/Citrix%20Client%20notification/Images/HTML.png)
+![MAC client](https://github.com/Mohrpheus78/Citrix/blob/main/Citrix%20Client%20notification/Images/Mac.png)
