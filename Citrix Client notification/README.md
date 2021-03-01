@@ -19,7 +19,7 @@ To find out how to define the AppID, run
 ```
 Get-StartApps
 ```
-You get a list of possible values. Here you get more informatiosn about the AppID:  
+You get a list of possible values. Here you get more informations about the AppID:  
 https://docs.microsoft.com/en-us/windows/win32/shell/appids  
 https://toastit.dev/2018/02/04/burnttoast-appid-installer/  
 
@@ -74,6 +74,6 @@ Arguments:
 ## Logging
 A log for each client gets written to the "Logging" folder (which must exist!). The log file will be overwritten.
 
-## Example
+## Examples
 ![HTML client](https://github.com/Mohrpheus78/Citrix/blob/main/Citrix%20Client%20notification/Images/HTML.png)
 ![MAC client](https://github.com/Mohrpheus78/Citrix/blob/main/Citrix%20Client%20notification/Images/Mac.png)
