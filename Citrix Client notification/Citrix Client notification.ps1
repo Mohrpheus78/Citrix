@@ -20,7 +20,7 @@ You can override the predifined versions with these parameters:
 .EXAMPLE
 Powershell logonscript:
 Script Name:
-C:\Program Files (x86)\SuL\Scripts\Notifications\Citrix Client notification.ps1
+C:\Program Files (x86)\Scripts\Notifications\Citrix Client notification.ps1
 Script parameters:
 -WindowsClientMin "20.12.1.42" -MacClientMin "20.12.0.3"
 
@@ -37,7 +37,7 @@ In many cases admins hide the Powershell shortcuts from the start menu, so you h
 To define you own AppId you have to place a shortcut in the start menu and use this as your AppId. (e.g. a png file). The name of the AppId will be displayed at the bottom of the notification.
 To find out how to define the AppID, run "Get-StartApps". You get a list of possible values.
 Put your AppID in the $BTAppID variable!
-You get more information about the AppID here https://docs.microsoft.com/en-us/windows/win32/shell/appids and here https://toastit.dev/2018/02/04/burnttoast-appid-installer/.
+You get more informations about the AppID here https://docs.microsoft.com/en-us/windows/win32/shell/appids and here https://toastit.dev/2018/02/04/burnttoast-appid-installer/.
 
 Place the script in a local folder on the VDA, together with the CWA.png file. Create a folder "Logging" with write permissions for the users. 
 Run the script as a logon script or with Citrix WEM external task.
