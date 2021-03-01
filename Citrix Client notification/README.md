@@ -42,7 +42,7 @@ Run startup scripts asynchronously: Disabled
 Run Windows PowerShell scripts first at user logon, logoff: Enabled  
 
 ## Possible Citrix WorkspaceApp versions
-Of course there are more version, these are examples!
+Of course there are more versions, these are examples!
 ##### Windows client CR versions
 20.9.6.34 (2009.6), 20.10.0.20 (2010), 20.12.0.39 (2012), 20.12.1.42 (2012.1), 21.02.0.25 (2102)
 ##### Windows client LTSR version
