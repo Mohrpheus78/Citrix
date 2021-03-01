@@ -26,7 +26,7 @@ https://toastit.dev/2018/02/04/burnttoast-appid-installer/
 Place the script in a local folder on the VDA, together with the CWA.png file and a "Logging" folder with write permissions for the users. Run the script as a logon script or with Citrix WEM external task.  
 
 You can override the versions with these parameters:  
--WindowsClientMin "20.12.0.39" -MacClientMin "20.12.0.3" -LinuxClientMin "21.1.0.14"  
+-WindowsClientMin "21.02.0.29" -MacClientMin "20.12.0.3" -LinuxClientMin "21.1.0.14"  
 
 In a RDS environment you should configure the following group policies if you run logon scripts:  
 
@@ -48,7 +48,7 @@ Of course there are more version, these are examples!
 ##### Windows client LTSR version
 19.12.3000.6 (19.12.3000.6)
 ##### Mac client versions
-20.07.0.6 (2007), 20.08.0.3 (2008), 20.9.0.17 (2009), 20.10.0.16 (2010), 20.12.0.3 (2012), 21.01.0.21 (2101)
+20.07.0.6 (2007), 20.08.0.3 (2008), 20.9.0.17 (2009), 20.10.0.16 (2010), 20.12.0.3 (2012), 21.02.0.29 (2102)
 ##### Linux client versions
 20.9.0.15 (2009), 20.10.0.6 (2010), 21.1.0.14 (2011), 20.12.0.12 (2012)
 
