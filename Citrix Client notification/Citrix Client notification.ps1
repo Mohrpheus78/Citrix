@@ -36,7 +36,8 @@ BurntToast needs an AppId to display the notifications, default is Windows Power
 In many cases admins hide the Powershell shortcuts from the start menu, so you have to define your own AppId.
 To define you own AppId you have to place a shortcut in the start menu and use this as your AppId. (e.g. a png file). The name of the AppId will be displayed at the bottom of the notification.
 To find out how to define the AppID, run "Get-StartApps". You get a list of possible values.
-You get more informatiosn about the AppID here https://docs.microsoft.com/en-us/windows/win32/shell/appids and here https://toastit.dev/2018/02/04/burnttoast-appid-installer/.
+Put your AppID in the $BTAppID variable!
+You get more information about the AppID here https://docs.microsoft.com/en-us/windows/win32/shell/appids and here https://toastit.dev/2018/02/04/burnttoast-appid-installer/.
 
 Place the script in a local folder on the VDA, together with the CWA.png file. Create a folder "Logging" with write permissions for the users. 
 Run the script as a logon script or with Citrix WEM external task.
@@ -112,7 +113,7 @@ if ($ClientProductId -eq 257) {$ClientPlatform="HTML5"}
 
 # BurntToast variables
 $BTAppIcon = New-BTImage -Source "$PSScriptRoot\CWA.png" -AppLogoOverride
-$BTAppId = "{7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}\SuL\Scripts\Notifications\CWA.png"
+$BTAppId = "{7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}\Scripts\Notifications\CWA.png"
 $BTAudio = New-BTAudio -Source ms-winsoundevent:Notification.IM
 if ($Language -eq "de-DE") {
 	$BTText1 = New-BTText -Text "Ihr Citrix Client ist nicht aktuell!"
