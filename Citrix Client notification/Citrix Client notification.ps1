@@ -56,6 +56,7 @@ Purpose/Change:
 2021-02-22		Added BurntToast text
 2021-02-23		Added Linux client
 2021-02-28		Added logging
+2021-03-02		Changed languade detection
 #>
 
 [CmdletBinding()]
@@ -99,7 +100,7 @@ end {}
 
 # General variables
 $DateTime = (Get-Date -format dd-MM-yyyy) + " " + (Get-Date -format HH:mm:ss)
-$Language = (Get-Culture).Name
+$Language = [CultureInfo]::InstalledUICulture.Name
 $CitrixSessionID = Get-ChildItem -Path "HKCU:\Volatile Environment" -Name
 $CitrixClientName = Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_Client_Enum | Where-Object {$_.SessionID -eq $CitrixSessionID} | Select-Object -ExpandProperty Name
 [version]$CitrixClientVersion = Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_Client_Enum | Where-Object {$_.SessionID -eq $CitrixSessionID} | Select-Object -ExpandProperty Version
