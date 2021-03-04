@@ -28,10 +28,6 @@ Place the script in a local folder on the VDA, together with the CWA.png file an
 You can override the versions with these parameters:  
 -WindowsClientMin "21.02.0.29" -MacClientMin "20.12.0.3" -LinuxClientMin "21.1.0.14"  
 
-## Mail
-Use the Parameter MailButton to show the user a button which opens a predefined mail for the helpdesk, the drfault mailclient will be used
--Mailbutton True or False
-
 In a RDS environment you should configure the following group policies if you run logon scripts:  
 
 **Administrative Templates > Computer Configuration**  
@@ -44,7 +40,9 @@ Always wait for the network at computer startup and logon: Disabled
 *System/Scripts*  
 Run startup scripts asynchronously: Disabled  
 Run Windows PowerShell scripts first at user logon, logoff: Enabled  
-
+## Mail
+Use the Parameter MailButton to show the user a button which opens a predefined mail for the helpdesk, the drfault mailclient will be used
+-Mailbutton True or False
 ## Possible Citrix WorkspaceApp versions
 Of course there are more versions, these are examples!
 ##### Windows client CR versions
