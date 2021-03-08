@@ -70,6 +70,14 @@ New-ItemProperty -Path $RegistryPath -Name "Clientname" -Value $CitrixClientName
 $CitrixClientVer = Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_Client_Enum | Where-Object {$_.SessionID -eq $CitrixSessionID} | Select-Object -ExpandProperty Version
 New-ItemProperty -Path $RegistryPath -Name "Citrix Client Ver" -Value $CitrixClientVer -Force
 
+# Citrix Client Platform
+$ClientProductId=(Get-ItemProperty HKLM:\Software\Citrix\ICA\Session\$CitrixSessionID\Connection -name ClientProductId).ClientproductId
+if ($ClientProductId -eq 1) {$Platform="Windows"}
+if ($ClientProductId -eq 81) {$Platform="Linux"}
+if ($ClientProductId -eq 82) {$Platform="Mac"}
+if ($ClientProductId -eq 257) {$Platform="HTML5"}
+New-ItemProperty -Path $RegistryPath -Name "Citrix Client Platform" -Value $Platform -Force
+
 # Citrix Client IP
 $CitrixClientIP = Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_Client_Enum | Where-Object {$_.SessionID -eq $CitrixSessionID} | Select-Object -ExpandProperty Address
 New-ItemProperty -Path $RegistryPath -Name "Citrix Client IP" -Value $CitrixClientIP -Force
