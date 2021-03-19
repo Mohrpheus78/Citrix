@@ -6,12 +6,12 @@
 # 09/12/19	DM	Added deviceTRUST
 # 11/12/19	DM	Initial public release
 # 11/12/19	DM	Changed method to get session id
-# 18/06/20	DM  	Added MTU Size, WEM and VDA Agent version
+# 18/06/20	DM 	Added MTU Size, WEM and VDA Agent version
 # 26/06/20	DM	Added FSLogix Version
 # 26/06/20	DM	Changed BGInfo process handling
 # 20/10/20	DM	Added percent for FSL
 # 21/10/20	DM	Added WEM Cache date
-# 09/11/20  	DM  	Added Regkeys for IP and DNS (Standard method didn't work wirh Citrix Hypervisor)
+# 09/11/20  DM 	Added Regkeys for IP and DNS (Standard method didn't work wirh Citrix Hypervisor)
 # 18/12/20	DM	Added GPU Infos and Citrix Rendezvous protocol
 # 08/03/21	DM	Fixed FriendlyName to FileSystemLabel
 # *******************************************************************************************************
@@ -38,7 +38,7 @@ Edit the $BGInfoDir (Directory with BGInfo.exe) and $BGInfoFile (BGI file to loa
 # *******************
 
 # Source directory for BGInfo/BGInfo File (customize)
-$BGInfoDir = 'C:\Program Files (x86)\SuL\Citrix Management Tools\BGInfo'
+$BGInfoDir = 'C:\Program Files (x86)\BGInfo'
 $BGInfoFile = 'Citrix.bgi'
 
 # Regkey for setting the values (BGinfo gets informations from this source, don't edit!)
@@ -127,7 +127,7 @@ $MTUSize = (ctxsession -v | findstr "EDT MTU:" | Select-Object -Last 1).split(":
 New-ItemProperty -Path $RegistryPath -Name "MTU Size" -Value $MTUSize -Force
 
 # WEM Version
-$WEM = (Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object {$_.DisplayName -like "*Citrix Workspace Environment*"}).DisplayVersion | Select-Object -Last 1
+$WEM = (Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object {$_.DisplayName -like "*Citrix Workspace Environment*"}).DisplayVersion | Select-Object -First 1
 New-ItemProperty -Path $RegistryPath -Name "WEM Version" -Value $WEM -Force
 
 # WEM Agent logon
