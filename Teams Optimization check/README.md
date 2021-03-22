@@ -42,7 +42,7 @@ Parameters:
 A log for each client gets written to the "Logging" folder (which must exist!). The log file will be overwritten.
 
 ## Examples
-![Teams](https://github.com/Mohrpheus78/Citrix/blob/main/Citrix%20Client%20notification/Images/HTML.png)
-![Notification](https://github.com/Mohrpheus78/Citrix/blob/main/Citrix%20Client%20notification/Images/Mac.png)
+![Teams](https://github.com/Mohrpheus78/Citrix/blob/main/Teams%20Optimization%20check/Images/Teams%201.png)
+![Notification](https://github.com/Mohrpheus78/Citrix/blob/main/Teams%20Optimization%20check/Images/Teams%202.png)
 
 
