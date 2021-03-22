@@ -26,9 +26,9 @@ https://toastit.dev/2018/02/04/burnttoast-appid-installer/
 Place the script in a local folder on the VDA, together with the Teams.png file and a "Logging" folder with write permissions for the users. Run the script as a shortcut (replace with MS Teams shortcut)  
 
 ## Execution
-Shortcut
+Replace Teams shortcut with a custom shortcut.
 
-WEM action
+Example for WEM action:
 Command line:
 powershell.exe
 
