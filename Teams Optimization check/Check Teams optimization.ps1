@@ -1,7 +1,7 @@
-# *****************************************************
+# ****************************************************
 # D. Mohrmann, S&L Firmengruppe, Twitter: @mohrpheus78
-# Check Citrix Client version and notify user to update
-# *****************************************************
+# Check MS Teams optimization state and notify user
+# ****************************************************
 
 <#
 .SYNOPSIS
@@ -13,9 +13,6 @@ You need to create a shortcut for the user to launch the script. Replace the sho
 The script will first find the current session ID and the clientname of the user and what client platform/version is used in this session. The display language is determined to display
 the notification in the correct language. The toast notification appears longer than the default value (line 138). 
    
-.PARAMETER
-No parameter required
-
 .EXAMPLE
 WEM action
 Command line:
@@ -26,7 +23,6 @@ C:\Program Files (x86)\Microsoft\Teams\current
 
 Parameters:
 -executionpolicy bypass -windowstyle hidden -file "C:\Program Files (x86)\Scripts\Check Teams optimization.ps1"
-
 
 .NOTES
 Attention:

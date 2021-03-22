@@ -13,10 +13,17 @@ A log for each client gets written to the "Logging" folder (which must exist!)
 The script will first find the current session id and the cientname of the user and what client platform/version is used in this session. The display language is determined to display
 the notification in the correct language. The toast notification appears longer than the default value (line 112). 
    
-.PARAMETER
-You can override the predifined versions with these parameters:
-- WindowsClientMin "20.12.0.39" -MacClientMin "20.12.0.3" -LinuxClientMin "21.1.0.14"
-The Parameter MailButton is mandatory, if you want to give the user the possibility to generate a mail for the support submit "True", otherwise "False"
+.PARAMETER -WindowsClientMin
+You can override the predifined versions
+- WindowsClientMin "20.12.0.39"
+.PARAMETER -MacClientMin
+You can override the predifined versions
+-MacClientMin "20.12.0.3"
+.PARAMETER -LinuxClientMin
+You can override the predifined versions
+-LinuxClientMin "21.1.0.14"
+.PARAMETER -MailButton
+This one is mandatory, if you want to give the user the possibility to generate a mail for the support submit "True", otherwise "False"
 -MailButton True
 
 .EXAMPLE
