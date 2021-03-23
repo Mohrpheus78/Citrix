@@ -5,7 +5,17 @@ This script will check if the MS Teams Citrix Optimization is working after star
 The script will first find the current session ID and the clientname of the user and what client platform/version is used in this session. The display language is determined to display the notification in the correct language. The toast notification appears longer than the default value (line 140). 
 
 ## How To
-Attention: Requires the BurntToast Powershell Module! https://github.com/Windos/BurntToast  
+Attention:
+
+Requires a registry key on the VDA!
+```
+HKLM\Software\Citrix\HDXMediaStream
+Name: WebrtcDirectorIntegration
+Type: DWORD
+Value: 1
+```
+
+Requires the BurntToast Powershell Module! https://github.com/Windos/BurntToast  
 Use
 ```
 Install-Module -Name BurntToast

@@ -26,7 +26,15 @@ Parameters:
 
 .NOTES
 Attention:
+
+Requires a registry key on the VDA! 
+HKLM\Software\Citrix\HDXMediaStream
+Name: WebrtcDirectorIntegration
+Type: DWORD
+Value: 1
+
 Requires a shortcut for the users to launch Teams (see information above)
+
 Requires the BurntToast Powershell Module! https://github.com/Windos/BurntToast
 Use "Install-Module -Name BurntToast" to install the module.
 BurntToast needs an AppId to display the notifications, default is Windows Powershell. BurntToast will check the start menu for the shortcut, no message is shown if Powershell cannot be found.
