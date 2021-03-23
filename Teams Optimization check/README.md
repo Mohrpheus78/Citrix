@@ -16,12 +16,10 @@ Value: 1
 ```
 
 Requires the BurntToast Powershell Module! https://github.com/Windos/BurntToast  
-Use
+Install the module on your Citrix VDA:
 ```
 Install-Module -Name BurntToast
 ```
-to install the module on your Citrix VDA.  
-
 BurntToast needs an AppId to display the notifications, default is Windows Powershell. BurntToast will check the start menu for the shortcut, no message is shown if Powershell cannot be found.
 The script runs in the user context and in many cases admins hide the Powershell shortcuts from the start menu, so you have to define your own AppId.
 To define you own AppId you have to place a shortcut in the start menu and use this as your AppId. (e.g. a png file). The name of the AppId will be displayed at the bottom of the notification.
