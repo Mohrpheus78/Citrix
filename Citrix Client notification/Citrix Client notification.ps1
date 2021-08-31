@@ -50,10 +50,10 @@ You get more informatiosn about the AppID here https://docs.microsoft.com/en-us/
 Place the script in a local folder on the VDA, together with the CWA.png file. Create a folder "Logging" with write permissions for the users. 
 Run the script as a logon script or with Citrix WEM external task.
 
-Windows client CR versions: 20.9.6.34 (2009.6), 20.10.0.20 (2010), 20.12.0.39 (2012), 20.12.1.42 (2012.1), 21.02.0.25 (2102), 21.3.1.25 (2103.1), 21.5.0.48 (2105)
-Windows client LTSR version: 19.12.3000.6, 19.12.4000.19
-Mac client versions: 20.07.0.6 (2007), 20.08.0.3 (2008), 20.9.0.17 (2009), 20.10.0.16 (2010), 20.12.0.3 (2012), 21.02.0.29 (2102)
-Linux client versions: 20.9.0.15 (2009), 20.10.0.6 (2010), 20.12.0.12 (2012), 21.1.0.14 (2101), 21.4.0.11 (2104)
+Windows client CR versions: 21.3.1.25 (2103.1), 21.5.0.48 (2105), 21.6.0.47 (2106), 21.8.0.4026 (2108)
+Windows client LTSR version: 19.12.3000.6, 19.12.4000.19, 19.12.5000.3
+Mac client versions: 21.06.0.31 (2106), 21.07.0.4 (2107), 21.08.0.15 (2108)
+Linux client versions: 21.4.0.11 (2104), 21.6.0.28 (2106), 21.8.0.40 (2108)
 
 Version:		1.1
 Author:         Dennis Mohrmann <@mohrpheus78>
