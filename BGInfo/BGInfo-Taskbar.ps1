@@ -100,7 +100,7 @@ $HDXCodec = Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_VirtualChanne
 New-ItemProperty -Path $RegistryPath -Name "HDX Codec" -Value $HDXCodec -Force
 
 # HDX Video Codec Type
-$HDXCodecType = Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_VirtualChannel_Thinwire_Enum | Where-Object {$_.SessionID -eq $CitrixSessionID} | Select-Object -ExpandProperty Component_Monitor_VideoCodecTypeCurrent
+$HDXCodecType = Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_VirtualChannel_Thinwire_Enum | Where-Object {$_.SessionID -eq $CitrixSessionID} | Select-Object -ExpandProperty Component_Monitor_VideoCodecType
 New-ItemProperty -Path $RegistryPath -Name "HDX Codec Type" -Value $HDXCodecType -Force
 
 # HDX Visual Quality
