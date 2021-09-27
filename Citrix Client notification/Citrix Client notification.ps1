@@ -52,7 +52,7 @@ Run the script as a logon script or with Citrix WEM external task.
 
 Windows client CR versions: 21.3.1.25 (2103.1), 21.5.0.48 (2105), 21.6.0.47 (2106), 21.8.0.4026 (2108)
 Windows client LTSR version: 19.12.3000.6, 19.12.4000.19, 19.12.5000.3
-Mac client versions: 21.06.0.31 (2106), 21.07.0.4 (2107), 21.08.0.15 (2108)
+Mac client versions: 21.06.0.31 (2106), 21.07.0.4 (2107), 21.8.1.20 (2108.1)
 Linux client versions: 21.4.0.11 (2104), 21.6.0.28 (2106), 21.8.0.40 (2108)
 
 Version:		1.1
@@ -65,6 +65,7 @@ Purpose/Change:
 2021-02-23		Added Linux client
 2021-02-28		Added logging
 2021-03-04		Added mail button
+2021-09-27		Changed client versions
 #>
 
 [CmdletBinding()]
@@ -72,15 +73,15 @@ Purpose/Change:
 param(     
       [Parameter(
 	  Mandatory = $false)]
-	  [version]$WindowsClientMin = "21.02.0.25", # define minimum client version here
+	  [version]$WindowsClientMin = "21.8.0.4026", # define minimum client version here
 	       
       [Parameter(
 	  Mandatory = $false)]  
-      [version]$MacClientMin = "21.22.0.29", # define minimum client version here
+      [version]$MacClientMin = "21.8.1.20", # define minimum client version here
 	  
 	  [Parameter(
 	  Mandatory = $false)]  
-      [version]$LinuxClientMin = "21.1.0.14", # define minimum client version here
+      [version]$LinuxClientMin = "21.8.0.40", # define minimum client version here
 
       [Parameter(
       Mandatory = $true)]
