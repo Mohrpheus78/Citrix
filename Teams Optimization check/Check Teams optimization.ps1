@@ -5,7 +5,7 @@
 
 <#
 .SYNOPSIS
-This script will check if the MS Teams Citrix Optimization is working after starting Teams.  After 25 sec. (launch time of Teams) the user gets a toast notificaton if the optimization is NOT active.
+This script will check if the MS Teams Citrix Optimization is working after starting Teams.  After 30 sec. (launch time of Teams) the user gets a toast notificaton if the optimization is NOT active.
 A log for each client gets written to the "Logging" folder (which must exist with write permissions for users!)
 You need to create a shortcut for the user to launch the script. Replace the shortcut with the standard Teams shortcut.
 	
@@ -88,7 +88,7 @@ end {}
 
 # Lanch MS Teams and wait 25 seconds to check the status
 Start-Process -FilePath "${env:ProgramFiles(x86)}\Microsoft\Teams\current\Teams.exe"
-Start-Sleep -s 25
+Start-Sleep -s 30
 
 # General variables
 $DateTime = (Get-Date -format dd-MM-yyyy) + " " + (Get-Date -format HH:mm:ss)
