@@ -4,9 +4,7 @@ This script will generate a HTML report of your current vDisk versions
 	
 .DESCRIPTION
 The purpose of the script is, that you have a documentation of your vDisk versions, especially the descriptions of the versions that get lost after merging 
-   
-.PARAMETER -Sitename
-Sitename of yout PVS site
+
 .PARAMETER -outputpath
 The path where the report is saved
 
@@ -23,19 +21,13 @@ Creation Date:  2021-10-16
 Purpose/Change:	
 2021-10-16		Inital version
 2021-10-17		changed HTML style
-2021-10-18		added parameters and vDisk type
+2021-10-18		added parameter and vDisk type
 #>
 
 [CmdletBinding()]
 
 param (
-		# Name of PVS site
-		[Parameter(Mandatory = $true)]
-		[ValidateNotNull()]
-		[ValidateNotNullOrEmpty()]
-		[Array]$Sitename,
-	 
-		# Name of PVS site
+		# Output folder for HTML report
 		[Parameter(Mandatory = $true)]
 		[ValidateNotNull()]
 		[ValidateNotNullOrEmpty()]
@@ -316,7 +308,7 @@ rm $logfile -force -EA SilentlyContinue
 " " | LogMe -display -progress
 
 "Initiate PVS vDisk check" | LogMe
-#$Sitename = "Testlab"
+$Sitename = (Get-PvsSite).SiteName
 $EnvName = "PVS vDisk Versions"
 PVSvDiskCheck
 WriteHTML
