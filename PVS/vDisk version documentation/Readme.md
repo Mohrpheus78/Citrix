@@ -1,10 +1,10 @@
-# PVS vDisk version documenation
+# PVS vDisk version documentation
 
 This script will generate a HTML report of your current vDisk versions
 
 ## Parameter
 -Sitename
-Sitename of yout PVS site
+Sitename of yout PVS site  
 -outputpath
 The path where the report is saved
 	
