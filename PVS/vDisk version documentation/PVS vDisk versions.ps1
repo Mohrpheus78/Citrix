@@ -61,7 +61,7 @@ $resultsHTM = Join-Path $outputpath ("PVS vDisk Versions-$outputdate.htm") #add 
 $vDiksFirstheaderName = "vDisk Name"
 $vDiskheaderNames = "Site", "Store", "vDiskFileName", "Version", "Type", "CreateDate" , "ReplState", "Description"
 $vDiskheaderWidths = "auto","auto","auto","auto","auto","auto","auto","auto"
-$vDisktablewidth = "1600"
+$vDisktablewidth = "1400"
  
 #==============================================================================================
 #log function
@@ -125,7 +125,7 @@ border: thin solid #000000;
 </style>
 </head>
 <body>
-<table width='1600'>
+<table width='1400'>
 <tr bgcolor='#e6e6e6'>
 <td colspan='7' height='35' align='center' valign="middle">
 <font face='Tahoma' color='#313233' size='4'>
