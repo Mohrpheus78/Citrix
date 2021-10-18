@@ -3,10 +3,10 @@
 This script will generate a HTML report of your current vDisk versions
 
 ## Parameter
--Sitename
-Sitename of yout PVS site  
--outputpath
-The path where the report is saved
+-Sitename  
+Site name of your PVS site  
+-outputpath  
+The path where the HTML report is saved
 	
 ## Example
 & '.\PVS vDisk versions.ps1' -Sitename Testlab -outputpath C:\Users\admin\Desktop
