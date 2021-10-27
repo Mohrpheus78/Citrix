@@ -34,13 +34,14 @@ param (
 		[Array]$outputpath
 	  )
 
-#Don't change below here if you don't know what you are doing ... 
-#==============================================================================================
+# Check if PVS SnapIn is available
 if ($null -eq (Get-PSSnapin "Citrix.PVS.SnapIn" -EA silentlycontinue)) {
-try { Add-PSSnapin Citrix.PVS.SnapIn -ErrorAction Stop }
-catch { write-error "Error loading Citrix.PVS.SnapIn PowerShell snapin"; Return }
-}
-#==============================================================================================
+	try {
+		Add-PSSnapin Citrix.PVS.SnapIn -ErrorAction Stop
+	}
+	catch {
+		write-error "Error loading Citrix.PVS.SnapIn PowerShell snapin"; Return }
+	}
 
 #$ReportDate = (Get-Date -UFormat "%A, %d. %B %Y %R")
 #==============================================================================================
