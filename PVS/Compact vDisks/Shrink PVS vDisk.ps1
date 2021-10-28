@@ -12,9 +12,6 @@ https://www.citrix.com/blogs/2015/01/19/size-matters-pvs-ram-cache-overflow-sizi
 The script will first find out what the latest merged base disk is (VHDX). After that the vDisk gets defragmented and shrinked.
 At the end you will see the vDisk size before and after shrinking.
 vDisk can't be in use while executing the script!
-
-.PARAMETER vdiskpath
--vdiskpath "Path to PVS vDisks"
 	
 .EXAMPLE
 ."Compact PVS vDisk.ps1" -vdiskpath "D:\vDisks\CVAD"
@@ -24,20 +21,18 @@ Run as administrator after you create a new merged base disk that isn't in use y
 Tested with UEFI partitions and standard partititions without system reserved partition.
 Sometimes the "detach disk" command from diskpart doesn't work as expected, so the vDisk is still mounted, so the dismount command runs again
 after diskpart
+
+
+Version:		1.1
+Author:         Dennis Mohrmann <@mohrpheus78>
+Creation Date:  2021-10-16
+Purpose/Change:	
+2021-01-19		Inital version
+2021-10-28		no parameter needed anymore
 #>
 
+$ScriptStart = Get-Date
 
-[CmdletBinding()]
-
-param
-    (
-     # Path to PVS VHDX files
-     [Parameter(Mandatory = $true)]
-     [ValidateNotNull()]
-     [ValidateNotNullOrEmpty()]
-     [String]$vdiskpath
-    )
-	
 # FUNCTION Logging
 # ========================================================================================================================================
 function DS_WriteLog
@@ -203,8 +198,51 @@ else
 
 # Scriptblock for defragmenting the PVS vDisk
 # ========================================================================================================================================
-# Get latest merged vDisk and vDisk Size
-$vhd = (Get-ChildItem "$vdiskpath" -Recurse | Where-Object {$_.fullname -like "*.vhdx"} | Sort-Object LastWriteTime -Descending | Select-Object -First 1).name
+# Check if PVS SnapIn is available
+if ($null -eq (Get-PSSnapin "Citrix.PVS.SnapIn" -EA silentlycontinue)) {
+	try {
+		Add-PSSnapin Citrix.PVS.SnapIn -ErrorAction Stop
+	}
+	catch {
+		write-error "Error loading Citrix.PVS.SnapIn PowerShell snapin"; Return }
+	}
+
+Write-Host -ForegroundColor Yellow "Shrink PVS vDisk" `n
+
+# Get PVS SiteName
+$SiteName = (Get-PvsSite).SiteName
+
+# Get all vDisks
+$AllvDisks = Get-PvsDiskInfo -SiteName $SiteName
+
+# Add property "ID" to object
+$ID = 1
+$AllvDisks | ForEach-Object {
+    $_ | Add-Member -MemberType NoteProperty -Name "ID" -Value $ID 
+    $ID += 1
+    }
+
+# Show menu to select vDisk
+Write-Host "Available vDisks:" `n 
+$ValidChoices = 1..($AllvDisks.Count)
+$Menu = $AllvDisks | ForEach-Object {(($_.ID).toString() + "." + " " +  $_.Name + " " + "-" + " " + "Storename:" + " " + $_.Storename)}
+$Menu | Out-Host
+Write-Host
+$vDisk = Read-Host -Prompt 'Select vDisk to shrink'
+
+$vDisk = $AllvDisks | Where-Object {$_.ID -eq $vDisk}
+if ($vDisk.ID -notin $ValidChoices) {
+    Write-Host -ForegroundColor Red "Selected vDisk not found, aborting!"
+    BREAK
+    }
+
+$vDiskName = $vDisk.Name
+$StoreName = $vDisk.StoreName
+
+$version = ((Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName) | Where-Object {$_.Type -eq '4' -and $_.Access -eq 0})
+$vhd = $version.DiskFileName
+$vdiskpath  = (Get-PvsStore -StoreName "$StoreName").Path
+
 $vhdsizebefore = (Get-ChildItem "$vdiskpath" -Recurse | Where-Object {$_.fullname -like "*.vhdx"} | Sort-Object LastWriteTime | Sort-Object -Descending  | Select-Object -First 1 @{n='Size';e={DisplayInBytes $_.length}}).Size
 
 # Get next free drive
@@ -311,3 +349,10 @@ $vhdsizeafter = (Get-ChildItem "$vdiskpath" -Recurse | Where-Object {$_.fullname
 DS_WriteLog "I" "Size of vDisk: $vhd before shrinking: $vhdsizebefore - Size of vDisk: $vhd after shrinking: $vhdsizeafter" $LogFile
 Write-Output "Size of vDisk: $vhd before shrinking: $vhdsizebefore - Size of vDisk: $vhd after shrinking: $vhdsizeafter"
 # ========================================================================================================================================
+
+Write-Host -ForegroundColor Green "Ready! vDisk $vDiskName successfully shrinked" `n
+
+$ScriptEnd = Get-Date
+$ScriptRuntime =  $ScriptEnd - $ScriptStart | Select-Object TotalSeconds
+$ScriptRuntimeInSeconds = $ScriptRuntime.TotalSeconds
+Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSeconds seconds"
