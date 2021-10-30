@@ -59,7 +59,9 @@ $AllvDisks = @(Get-PvsDiskInfo -SiteName $SiteName | Select-Object -Property Nam
 
 # Export (XML) all vDisks
 foreach ($vdisk in $AllvDisks) {
-Export-PvsDisk -DiskLocatorName $AllvDisks.Name -SiteName $SiteName -StoreName $AllvDisks.Storename }
+	Export-PvsDisk -DiskLocatorName $AllvDisks.Name -SiteName $SiteName -StoreName $AllvDisks.Storename
+	}
+Write-Host -Foregroundcolor Green "ready"
 
 # Stop Logging
 Stop-Transcript | Out-Null
