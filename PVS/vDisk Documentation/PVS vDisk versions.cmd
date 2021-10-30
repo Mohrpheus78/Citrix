@@ -1,7 +1,7 @@
-REM ***********************************************************
-REM Skript zum Erstellen einen HTML Reports der vDisk Versionen
-REM Dennis Mohrmann, S&L
-REM ***********************************************************
+REM ********************************************
+REM Skript Launcher for PVS vDisk versions .ps1) 
+REM Dennis Mohrmann <@mohrpheus78>
+REM ********************************************
 
 @ECHO OFF
 CLS

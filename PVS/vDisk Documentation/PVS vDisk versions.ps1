@@ -28,10 +28,10 @@ Purpose/Change:
 
 param (
 		# Path to HTML Report
-		[Parameter(Mandatory = $true)]
+		[Parameter(Mandatory = $false)]
 		[ValidateNotNull()]
 		[ValidateNotNullOrEmpty()]
-		[Array]$outputpath
+		[Array]$outputpath = "C:\Program Files (x86)\Scripts\vDisk Documentation"
 	  )
 
 # Check if PVS SnapIn is available
@@ -335,3 +335,4 @@ $scriptruntimeInSeconds = $scriptruntime.TotalSeconds
 "Script was running for $scriptruntimeInSeconds " | LogMe -display -progress
 
 .$resultsHTM
+
