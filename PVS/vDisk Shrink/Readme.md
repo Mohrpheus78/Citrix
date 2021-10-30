@@ -9,4 +9,4 @@ Run as administrator after you create a new merged base disk that isn't in use y
 Place the folder with all files inside the folder "C:\Program Files (x86)\Scripts", so that you can use the shortcut.
 
 ## Examples
-![Versions](https://github.com/Mohrpheus78/Citrix/blob/main/PVS/vDisk%20Documentation/Images/PVSversions.png)
+![Versions](https://github.com/Mohrpheus78/Citrix/blob/main/PVS/vDisk%20Shrink/Images/PVS-Shrink.png)

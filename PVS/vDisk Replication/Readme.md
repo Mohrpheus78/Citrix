@@ -3,3 +3,6 @@ The purpose of the script is to replicate vDisk versions to all other PVS server
 
 ## Example
 & '.\Replicate PVS vDisk.ps1' or use shortcut.
+
+## Examples
+![Versions](https://github.com/Mohrpheus78/Citrix/blob/main/PVS/vDisk%20Replication/Images/PVS-Replication.png)
