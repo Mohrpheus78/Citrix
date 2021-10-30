@@ -4,3 +4,6 @@ the site that hosts this vDisk if you want. You can also generate a HTML report 
 
 ## Example
 & '.\Merge PVS vDisk.ps1' or use shortcut.
+
+## Examples
+![Versions](https://github.com/Mohrpheus78/Citrix/blob/main/PVS/vDisk%20Merge/Images/PVS-merge.png)
