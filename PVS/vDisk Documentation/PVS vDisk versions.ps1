@@ -9,7 +9,7 @@ The purpose of the script is, that you have a documentation of your vDisk versio
 The path where the report is saved
 
 .EXAMPLE
-& '.\PVS vDisk versions.ps1' -Sitename Testlab -outputpath C:\Users\admin\Desktop
+& '.\PVS vDisk versions.ps1' -Sitename Testlab -outputpath C:\Users\admin\Desktop or use shortcut
 
 .NOTES
 The script is based on the excellent PVS Health Check script from Sacha Thomet (@sacha81): https://github.com/sacha81/citrix-pvs-healthcheck/blob/master/Citrix-PVS-Farm-Health-toHTML_Parameters.xml

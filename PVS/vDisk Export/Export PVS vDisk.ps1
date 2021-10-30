@@ -1,6 +1,15 @@
-﻿#######################################################
-# Skript zum Exportieren der vDisks, D. Mohrmann S&L
-#######################################################
+﻿<#
+.SYNOPSIS
+This script will generate a XML export of your vDisk in the same folder.
+	
+.DESCRIPTION
+The purpose of the script is to generate y XML backup file to be able to recreate a vDisk chain if you restore vDisk versions
+
+.EXAMPLE
+& '.\Export PVS vDisk.ps1' or use the shortcut
+
+.NOTES
+#>
 
 # Variables
 $Date = Get-Date -UFormat "%d.%m.%Y"

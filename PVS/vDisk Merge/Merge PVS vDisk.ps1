@@ -1,16 +1,13 @@
 ﻿<#
 .SYNOPSIS
-This script will merge a PVS vDisk you choose
+This script will merge a PVS vDisk you choose.
 	
 .DESCRIPTION
 The purpose of the script is to merge vDisk versions to a merged base and promote the new base to production. After that the vDisk will be replicated to all other PVS servers in 
-the site that hosts this vDisk
-   
-.PARAMETER
-No parameters required
+the site that hosts this vDisk if you want. You can also generate a HTML report of your vDisk versions. In this case you also have to place the "vDisk Documentation" folder in the scripts folder.
 
 .EXAMPLE
-& '.\Merge PVS vDisk.ps1'
+& '.\Merge PVS vDisk.ps1' or use shortcut
 
 .NOTES
 
@@ -96,7 +93,7 @@ $vDiskName = $vDisk.Name
 $StoreName = $vDisk.StoreName
 
 # Merge selected vDisk if possible
-$CanMerge = ((Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName) | Select -First 1 | Where-Object {$_.CanMerge -eq 'False'})
+$CanMerge = ((Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName) | Select-Object -First 1 | Where-Object {$_.CanMerge -eq 'False'})
 if (-not($CanMerge)) {
     Write-Host -ForegroundColor Red "Current vDisk version is a merged base or in private mode, aborting!"
     BREAK
@@ -109,7 +106,7 @@ else {
 # Wait until merging is finished
 Do {
     Write-Host -ForegroundColor Green "Merging, please wait..."
-    $MergeTask = (Get-PvsTask | select -Last 1).State
+    $MergeTask = (Get-PvsTask | Select-Object -Last 1).State
     Start-Sleep 8
     }
 Until ($MergeTask -eq 2)
@@ -118,7 +115,7 @@ Until ($MergeTask -eq 2)
 Invoke-PvsPromoteDiskVersion -DiskLocatorName "$vDiskName" -StoreName "$StoreName" -SiteName "$SiteName"
 
 # Get version number of base
-$LastVersion = (Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName).Version | select -First 1
+$LastVersion = (Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName).Version | Select-Object -First 1
 
 # Enter description "Merged Base" into merged base disk 
 Set-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName -Version $LastVersion -Description "Merged Base"

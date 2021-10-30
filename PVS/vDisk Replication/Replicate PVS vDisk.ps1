@@ -1,18 +1,14 @@
 <#
 .SYNOPSIS
-This script will replicate a PVS vDisk you choose from your PVS site
+This script will replicate a PVS vDisk you choose from your PVS site.
 	
 .DESCRIPTION
 The purpose of the script is to replicate vDisk versions to all other PVS servers in the site that hosts this vDisk
-   
-.PARAMETER
-No parameters required
 
 .EXAMPLE
-& '.\Replicate PVS vDisk.ps1'
+& '.\Replicate PVS vDisk.ps1' or use shortcut.
 
 .NOTES
-
 Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-10-27
@@ -21,7 +17,6 @@ Purpose/Change:
 #>
 
 # Variables
-$FolderBack = Split-Path -Path $PSScriptRoot
 $Date = Get-Date -UFormat "%d.%m.%Y"
 $Log = "$PSScriptRoot\Replicate PVS vDisks-$Date.log"
 

@@ -14,7 +14,7 @@ At the end you will see the vDisk size before and after shrinking.
 vDisk can't be in use while executing the script!
 	
 .EXAMPLE
-."Compact PVS vDisk.ps1" -vdiskpath "D:\vDisks\CVAD"
+."Shrink PVS vDisk.ps1"
     
 .NOTES
 Run as administrator after you create a new merged base disk that isn't in use yet.
