@@ -5,6 +5,6 @@ REM ***********************************************************
 
 @ECHO OFF
 CLS
-%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -WindowStyle Maximized -NoLogo -ExecutionPolicy ByPass -File "%~dp0PVS vDisk versions.ps1" -outputpath "C:\Program Files (x86)\SuL\Scripts\vDisk Documentation"
+%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -WindowStyle Maximized -NoLogo -ExecutionPolicy ByPass -File "%~dp0PVS vDisk versions.ps1" -outputpath "C:\Program Files (x86)\Scripts\vDisk Documentation"
 pause
 
