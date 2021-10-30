@@ -13,3 +13,6 @@ The script is based on the excellent PVS Health Check script from Sacha Thomet (
 I used most of the code and added the decription, there is also no need of the XML file.  
 If you want to change the table width cause you need more space for the descriptions, increase the value '1400' in lines 80 and 144 to something higer.
 Place the folder with all files inside the folder "C:\Program Files (x86)\Scripts", so that you can use the shortcut.
+
+## Examples
+![Versions](https://github.com/Mohrpheus78/Citrix/tree/main/PVS/vDisk%20Documentation/Images/PVSVersions.png)
