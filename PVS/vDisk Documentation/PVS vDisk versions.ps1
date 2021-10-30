@@ -60,6 +60,7 @@ else
    {
     # Script doesn't run as admin, stop!
     Write-Verbose "Error! Script is NOT running with Admin rights!" -Verbose
+	Read-Host "Press any key to exit"
     BREAK
    }
 # ========================================================================================================================================

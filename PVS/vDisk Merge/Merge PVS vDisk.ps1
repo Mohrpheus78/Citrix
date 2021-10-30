@@ -56,6 +56,7 @@ else
    {
     # Script doesn't run as admin, stop!
     Write-Verbose "Error! Script is NOT running with Admin rights!" -Verbose
+	Read-Host "Press any key to exit"
     BREAK
    }
 # ========================================================================================================================================
@@ -86,6 +87,7 @@ $vDisk = Read-Host -Prompt 'Select vDisk to merge'
 $vDisk = $AllvDisks | Where-Object {$_.ID -eq $vDisk}
 if ($vDisk.ID -notin $ValidChoices) {
     Write-Host -ForegroundColor Red "Selected vDisk not found, aborting!"
+	Read-Host "Press any key to exit"
     BREAK
     }
 
@@ -96,6 +98,7 @@ $StoreName = $vDisk.StoreName
 $CanMerge = ((Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName) | Select-Object -First 1 | Where-Object {$_.CanMerge -eq 'False'})
 if (-not($CanMerge)) {
     Write-Host -ForegroundColor Red "Current vDisk version is a merged base or in private mode, aborting!"
+	Read-Host "Press any key to exit"
     BREAK
     }
 
@@ -188,3 +191,5 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
+
+Read-Host "Press any key to exit"

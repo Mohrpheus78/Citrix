@@ -9,6 +9,9 @@ The purpose of the script is to generate y XML backup file to be able to recreat
 & '.\Export PVS vDisk.ps1' or use the shortcut
 
 .NOTES
+
+Version:		1.0
+Author:         Dennis Mohrmann <@mohrpheus78>
 #>
 
 # Variables
@@ -41,6 +44,7 @@ else
    {
     # Script doesn't run as admin, stop!
     Write-Verbose "Error! Script is NOT running with Admin rights!" -Verbose
+	Read-Host "Press any key to exit"
     BREAK
    }
 # ========================================================================================================================================
@@ -61,3 +65,5 @@ Export-PvsDisk -DiskLocatorName $AllvDisks.Name -SiteName $SiteName -StoreName $
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
+
+Read-Host `n "Press any key to exit"

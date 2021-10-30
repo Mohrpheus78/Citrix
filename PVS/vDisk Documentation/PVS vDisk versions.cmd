@@ -1,7 +1,7 @@
-REM ********************************************
-REM Skript Launcher for PVS vDisk versions .ps1) 
+REM *******************************************
+REM Script Launcher for PVS vDisk versions .ps1 
 REM Dennis Mohrmann <@mohrpheus78>
-REM ********************************************
+REM *******************************************
 
 @ECHO OFF
 CLS

@@ -191,6 +191,7 @@ else
    {
     # Script doesn't run as admin, stop!
     Write-Verbose "Error! Script is NOT running with Admin rights!" -Verbose
+	Read-Host "Press any key to exit"
     BREAK
    }
 # ========================================================================================================================================
@@ -233,6 +234,7 @@ $vDisk = Read-Host -Prompt 'Select vDisk to shrink'
 $vDisk = $AllvDisks | Where-Object {$_.ID -eq $vDisk}
 if ($vDisk.ID -notin $ValidChoices) {
     Write-Host -ForegroundColor Red "Selected vDisk not found, aborting!"
+	Read-Host "Press any key to exit"
     BREAK
     }
 
@@ -255,7 +257,8 @@ if ($mount -eq "1")
     {
      DS_WriteLog "E" "Mounting vDisk: $vhd failed" $LogFile
      Write-Output "Mounting vDisk: $vhd failed"
-     break
+	 Read-Host "Press any key to exit"
+     BREAK
     }
 DS_WriteLog "I" "Mounting vDisk: $vhd" $LogFile
 Write-Output "Mounting vDisk: $vhd"
@@ -280,6 +283,7 @@ if ($dismount -eq "1")
     {
      DS_WriteLog "E" "Failed to dismount vDisk: $vhd" $LogFile
      Write-Output "Failed to dismount vDisk: $vhd"
+	 Read-Host "Press any key to exit"
      BREAK
     }
 DS_WriteLog "I" "Dismounting vDisk: $vhd" $LogFile
@@ -338,6 +342,7 @@ if ($dismount -eq "1")
     {
      DS_WriteLog "E" "Failed to dismount vDisk: $vhd" $LogFile
      Write-Output "Failed to dismount vDisk: $vhd"
+	 Read-Host "Press any key to exit"
      BREAK
     }
 DS_WriteLog "I" "Dismounting vDisk: $vhd" $LogFile
@@ -356,3 +361,5 @@ $ScriptEnd = Get-Date
 $ScriptRuntime =  $ScriptEnd - $ScriptStart | Select-Object TotalSeconds
 $ScriptRuntimeInSeconds = $ScriptRuntime.TotalSeconds
 Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSeconds seconds"
+
+Read-Host `n "Press any key to exit"

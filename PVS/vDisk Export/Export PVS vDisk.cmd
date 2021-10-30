@@ -1,7 +1,7 @@
-REM ****************************************
-REM Skript zum Exportieren der vDisks (XML) 
-REM Dennis Mohrmann, S&L
-REM ****************************************
+REM *****************************************
+REM Script Launcher for Export PVS vDisk .ps1
+REM Dennis Mohrmann <@mohrpheus78>
+REM *****************************************
 
 CLS
 @ECHO OFF

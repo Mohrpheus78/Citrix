@@ -52,6 +52,7 @@ else
    {
     # Script doesn't run as admin, stop!
     Write-Verbose "Error! Script is NOT running with Admin rights!" -Verbose
+	Read-Host "Press any key to exit"
     BREAK
    }
 # ========================================================================================================================================
@@ -82,6 +83,7 @@ $vDisk = Read-Host -Prompt 'Select vDisk to replicate'
 $vDisk = $AllvDisks | Where-Object {$_.ID -eq $vDisk}
 if ($vDisk.ID -notin $ValidChoices) {
     Write-Host -ForegroundColor Red "Selected vDisk not found, aborting!"
+	Read-Host "Press any key to exit"
     BREAK
     }
 
@@ -120,5 +122,8 @@ $ScriptEnd = Get-Date
 $ScriptRuntime =  $ScriptEnd - $ScriptStart | Select-Object TotalSeconds
 $ScriptRuntimeInSeconds = $ScriptRuntime.TotalSeconds
 Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSeconds seconds"
+
+Read-Host `n "Press any key to exit"
+
 
 
