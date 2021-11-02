@@ -3,17 +3,18 @@
 This script will generate a HTML report of your current vDisk versions
 	
 .DESCRIPTION
-The purpose of the script is, that you have a documentation of your vDisk versions, especially the descriptions of the versions that get lost after merging 
+The purpose of the script is, that you have a documentation of your vDisk versions, especially the descriptions of the versions which get lost after merging a vDisk and deleting
+the old versions. 
 
 .PARAMETER -outputpath
-The path where the report is saved
+The path where the report is saved, default is "C:\Program Files (x86)\Scripts\vDisk Documentation".
 
 .EXAMPLE
-& '.\PVS vDisk versions.ps1' -Sitename Testlab -outputpath C:\Users\admin\Desktop or use shortcut
+& '.\PVS vDisk versions.ps1' -outputpath C:\Users\admin\Desktop or use shortcut
 
 .NOTES
 The script is based on the excellent PVS Health Check script from Sacha Thomet (@sacha81): https://github.com/sacha81/citrix-pvs-healthcheck/blob/master/Citrix-PVS-Farm-Health-toHTML_Parameters.xml
-I used most of the code and added the decription, there is also no need of the XML file. 
+I used most of the code and added the decription, there is also no need of the XML file. If you want to change the root folder you have to modify the shortcut and the output path for the report.  
 
 Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>
@@ -22,6 +23,8 @@ Purpose/Change:
 2021-10-16		Inital version
 2021-10-17		changed HTML style
 2021-10-18		added parameters and vDisk type
+2021-11-01		added RunAs Admin function
+2021-11-02		Changed log path and notes
 #>
 
 [CmdletBinding()]
@@ -34,6 +37,41 @@ param (
 		[Array]$outputpath = "C:\Program Files (x86)\Scripts\vDisk Documentation"
 	  )
 
+
+# RunAs Admin
+function Use-RunAs 
+{    
+    # Check if script is running as Administrator and if not elevate it
+    # Use Check Switch to check if admin 
+     
+    param([Switch]$Check) 
+     
+    $IsAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()` 
+        ).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator") 
+         
+    if ($Check) { return $IsAdmin }   
+      
+    if ($MyInvocation.ScriptName -ne "") 
+    {  
+        if (-not $IsAdmin)  
+          {  
+            try 
+            {  
+                $arg = "-WindowStyle Maximized -file `"$($MyInvocation.ScriptName)`"" 
+                Start-Process "$psHome\powershell.exe" -Verb Runas -ArgumentList $arg -ErrorAction 'stop'  
+            } 
+            catch 
+            { 
+                Write-Warning "Error - Failed to restart script elevated"  
+                break               
+            } 
+            exit 
+        }  
+    }  
+} 
+
+Use-RunAs
+
 # Check if PVS SnapIn is available
 if ($null -eq (Get-PSSnapin "Citrix.PVS.SnapIn" -EA silentlycontinue)) {
 	try {
@@ -42,37 +80,16 @@ if ($null -eq (Get-PSSnapin "Citrix.PVS.SnapIn" -EA silentlycontinue)) {
 	catch {
 		write-error "Error loading Citrix.PVS.SnapIn PowerShell snapin"; Return }
 	}
-	
-# Do you run the script as admin?
-# ========================================================================================================================================
-$myWindowsID=[System.Security.Principal.WindowsIdentity]::GetCurrent()
-$myWindowsPrincipal=new-object System.Security.Principal.WindowsPrincipal($myWindowsID)
-$adminRole=[System.Security.Principal.WindowsBuiltInRole]::Administrator
-
-if ($myWindowsPrincipal.IsInRole($adminRole))
-   {
-    # OK, runs as admin
-    Write-Verbose "OK, script is running with Admin rights" -Verbose
-    Write-Output ""
-   }
-
-else
-   {
-    # Script doesn't run as admin, stop!
-    Write-Verbose "Error! Script is NOT running with Admin rights!" -Verbose
-	Read-Host "Press any key to exit"
-    BREAK
-   }
-# ========================================================================================================================================
 
 #$ReportDate = (Get-Date -UFormat "%A, %d. %B %Y %R")
 #==============================================================================================
 
 Write-Host -ForegroundColor Yellow "PVS vDisk version documentation" `n
 
-$outputdate = Get-Date -Format 'yyyy-MM-dd'
-$logfile = Join-Path $psscriptroot ("PVS vDisk Version.log")
-$resultsHTM = Join-Path $outputpath ("PVS vDisk Versions-$outputdate.htm") #add $outputdate in filename if you like
+$FolderBack = Split-Path -Path $PSScriptRoot
+$Date = Get-Date -UFormat "%d.%m.%Y"
+$logfile = Join-Path "$FolderBack\Logs" ("PVS vDisk Version-$Date.log")
+$resultsHTM = Join-Path $outputpath ("PVS vDisk Versions-$Date.htm")
 
 #Header for Table 1 "vDisk Checks"
 $vDiksFirstheaderName = "vDisk Name"
@@ -281,7 +298,7 @@ function PVSvDiskCheck() {
 			"$diskversionfilename correct replicated" | LogMe
 			$ReplStateStatus = "SUCCESS"
 			 } else {
-			"$diskversionfilename not correct replicated $ReplErrorCount errors" | LogMe -display -error
+			"$diskversionfilename not correct replicated $ReplErrorCount errors" | LogMe -display -err
 			$ReplStateStatus = "ERROR"}
 			}
 
@@ -336,4 +353,3 @@ $scriptruntimeInSeconds = $scriptruntime.TotalSeconds
 "Script was running for $scriptruntimeInSeconds " | LogMe -display -progress
 
 .$resultsHTM
-

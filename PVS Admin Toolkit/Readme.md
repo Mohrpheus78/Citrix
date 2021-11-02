@@ -1,5 +1,5 @@
-# Citrix PVS scripts
-Useful scripts for your Citrix PVS environment
+# Citrix PVS Adminn Toolkit
+Useful scripts for your Citrix PVS environment, manage PVS with powershell.
 
 ## vDisk Shrink
 The script will find all available vDisks and next find out what the latest merged base disk is (VHDX). After that the vDisk gets defragmented and shrinked. At the end you will see the vDisk size before and after shrinking. vDisk can't be in use while executing the script!
@@ -15,3 +15,8 @@ This script will replicate a PVS vDisk with all version files to all other PVS s
 
 ## vDisk Merge
 This script will merge a PVS vDisk you choose.
+
+## vDisk Maintenance
+The script will create new vDisk versions and promote these versions to test or production mode.
+
+![Toolkit](https://github.com/Mohrpheus78/Citrix/blob/main/PVS/vDisk%20Documentation/Images/PVSversions.png)

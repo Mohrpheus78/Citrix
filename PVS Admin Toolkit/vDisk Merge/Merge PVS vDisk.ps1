@@ -20,10 +20,46 @@ Purpose/Change:
 2021-10-27		changed description
 #>
 
+
+# RunAs Admin
+function Use-RunAs 
+{    
+    # Check if script is running as Administrator and if not elevate it
+    # Use Check Switch to check if admin 
+     
+    param([Switch]$Check) 
+     
+    $IsAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()` 
+        ).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator") 
+         
+    if ($Check) { return $IsAdmin }   
+      
+    if ($MyInvocation.ScriptName -ne "") 
+    {  
+        if (-not $IsAdmin)  
+          {  
+            try 
+            {  
+                $arg = "-WindowStyle Maximized -file `"$($MyInvocation.ScriptName)`"" 
+                Start-Process "$psHome\powershell.exe" -Verb Runas -ArgumentList $arg -ErrorAction 'stop'  
+            } 
+            catch 
+            { 
+                Write-Warning "Error - Failed to restart script elevated"  
+                break               
+            } 
+            exit 
+        }  
+    }  
+} 
+
+Use-RunAs
+
+
 # Variables
 $FolderBack = Split-Path -Path $PSScriptRoot
 $Date = Get-Date -UFormat "%d.%m.%Y"
-$Log = "$PSScriptRoot\Merge PVS vDisks-$Date.log"
+$Log = "$FolderBack\Logs\Merge PVS vDisks-$Date.log"
 
 # Start logging
 Start-Transcript $Log | Out-Null
@@ -39,28 +75,7 @@ if ($null -eq (Get-PSSnapin "Citrix.PVS.SnapIn" -EA silentlycontinue)) {
 		write-error "Error loading Citrix.PVS.SnapIn PowerShell snapin"; Return }
 	}
 
-# Do you run the script as admin?
-# ========================================================================================================================================
-$myWindowsID=[System.Security.Principal.WindowsIdentity]::GetCurrent()
-$myWindowsPrincipal=new-object System.Security.Principal.WindowsPrincipal($myWindowsID)
-$adminRole=[System.Security.Principal.WindowsBuiltInRole]::Administrator
-
-if ($myWindowsPrincipal.IsInRole($adminRole))
-   {
-    # OK, runs as admin
-    Write-Verbose "OK, script is running with Admin rights" -Verbose
-    Write-Output ""
-   }
-
-else
-   {
-    # Script doesn't run as admin, stop!
-    Write-Verbose "Error! Script is NOT running with Admin rights!" -Verbose
-	Read-Host "Press any key to exit"
-    BREAK
-   }
-# ========================================================================================================================================
-
+# Merge vDisks
 Write-Host -ForegroundColor Yellow "Merge PVS vDisk" `n
 
 # Get PVS SiteName
@@ -128,7 +143,7 @@ Export-PvsDisk -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $Store
 
 # Replicate vDisk to all PVS server in store
 $title = "Replicate vDisks"
-$message = "Do you want to replicate the merged base diskt?"
+$message = "Do you want to replicate the merged base disk?"
 $yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes"
 $no = New-Object System.Management.Automation.Host.ChoiceDescription "&No"
 $options = [System.Management.Automation.Host.ChoiceDescription[]]($yes, $no)

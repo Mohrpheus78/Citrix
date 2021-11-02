@@ -33,53 +33,47 @@ Purpose/Change:
 
 $ScriptStart = Get-Date
 
-# FUNCTION Logging
-# ========================================================================================================================================
-function DS_WriteLog
-{
-	Param
-		( 
-		 [Parameter(Mandatory=$true, Position = 0)][ValidateSet("I","S","W","E","-",IgnoreCase = $True)][String]$InformationType,
-		 [Parameter(Mandatory=$true, Position = 1)][AllowEmptyString()][String]$Text,
-		 [Parameter(Mandatory=$true, Position = 2)][AllowEmptyString()][String]$LogFile
-		)
- 
-    begin
-    {
-    }
- 
-    process
-    {
-     $DateTime = (Get-Date -format dd-MM-yyyy) + " " + (Get-Date -format HH:mm:ss)
-     if ( $Text -eq "" )
-     	{
-         Add-Content $LogFile -value ("") # Write an empty line
-	}
-     Else
-	{
-	 Add-Content $LogFile -value ($DateTime + " " + $InformationType.ToUpper() + " - " + $Text)
-	}
-    }
- 
-    end
-    {
-    }
-}
+# RunAs Admin
+function Use-RunAs 
+{    
+    # Check if script is running as Administrator and if not elevate it
+    # Use Check Switch to check if admin 
+     
+    param([Switch]$Check) 
+     
+    $IsAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()` 
+        ).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator") 
+         
+    if ($Check) { return $IsAdmin }   
+      
+    if ($MyInvocation.ScriptName -ne "") 
+    {  
+        if (-not $IsAdmin)  
+          {  
+            try 
+            {  
+                $arg = "-WindowStyle Maximized -file `"$($MyInvocation.ScriptName)`"" 
+                Start-Process "$psHome\powershell.exe" -Verb Runas -ArgumentList $arg -ErrorAction 'stop'  
+            } 
+            catch 
+            { 
+                Write-Warning "Error - Failed to restart script elevated"  
+                break               
+            } 
+            exit 
+        }  
+    }  
+} 
 
+Use-RunAs
 
-# Logging
+# Variables
+$FolderBack = Split-Path -Path $PSScriptRoot
+$Date = Get-Date -UFormat "%d.%m.%Y"
+$Log = "$FolderBack\Logs\Shrink PVS vDisk-$Date.log"
 
-# Custom variables [edit]
-$BaseLogDir = "$PSScriptRoot"				# [edit] add the location of your log directory here
-$LogName = "Compact PVS vDisk" 		   		# [edit] enter the display name of the log
-$LogFileName = ("$($LogName).log")
-$LogFile = Join-path $BaseLogDir $LogFileName
-# Create new log file (overwrite existing one)
-New-Item $LogFile -ItemType "file" -force | Out-Null
-DS_WriteLog "I" "START SCRIPT - $LogName" $LogFile
-DS_WriteLog "-" "" $LogFile
-# ========================================================================================================================================
-
+# Start logging
+Start-Transcript $Log | Out-Null
 
 # FUNCTION Get next free drive letter
 # ========================================================================================================================================
@@ -117,7 +111,7 @@ function Get-NextFreeDriveLetter
         }
     else
 	    {
-	     Write-Output $Drives | Where-Object {-not(Test-Path -Path $_)}
+	     Write-Host $Drives | Where-Object {-not(Test-Path -Path $_)}
 	    }
 }
 # ========================================================================================================================================
@@ -171,29 +165,6 @@ function vhddismount($v)
       	  return "1"
      	 }
 }
-# ========================================================================================================================================
-
-
-# Do you run the script as admin?
-# ========================================================================================================================================
-$myWindowsID=[System.Security.Principal.WindowsIdentity]::GetCurrent()
-$myWindowsPrincipal=new-object System.Security.Principal.WindowsPrincipal($myWindowsID)
-$adminRole=[System.Security.Principal.WindowsBuiltInRole]::Administrator
-
-if ($myWindowsPrincipal.IsInRole($adminRole))
-   {
-    # OK, runs as admin
-    Write-Verbose "OK, script is running with Admin rights" -Verbose
-    Write-Output ""
-   }
-
-else
-   {
-    # Script doesn't run as admin, stop!
-    Write-Verbose "Error! Script is NOT running with Admin rights!" -Verbose
-	Read-Host "Press any key to exit"
-    BREAK
-   }
 # ========================================================================================================================================
 
 
@@ -255,42 +226,28 @@ $FreeDriveLetter = $FreeDrive -replace ".$" # cut ":"
 $mount = vhdmount -v $vhd
 if ($mount -eq "1")
     {
-     DS_WriteLog "E" "Mounting vDisk: $vhd failed" $LogFile
-     Write-Output "Mounting vDisk: $vhd failed"
+     Write-Host "Mounting vDisk: $vhd failed"
 	 Read-Host "Press any key to exit"
      BREAK
     }
-DS_WriteLog "I" "Mounting vDisk: $vhd" $LogFile
-Write-Output "Mounting vDisk: $vhd"
-Write-Output ""
+Write-Host `n"Mounting vDisk: $vhd"`n
 
 # Defrag
-DS_WriteLog "I" "Running defrag on vDisk: $vhd" $LogFile
-Write-Output "Running defrag on vDisk: $vhd"
-try {
+Write-Host "Running defrag on vDisk: $vhd"`n
 Start-Sleep 3
 Start-Process "defrag.exe" -ArgumentList "$FreeDrive /X /G /H /U /V" -wait
 Start-Sleep 3
-} catch {
-DS_WriteLog "E" "An error occured while running defrag (error: $($Error[0]))" $LogFile       
-}
-DS_WriteLog "-" "" $LogFile
-Write-Output ""
 
 # Dismounting vDisk
 $dismount = vhddismount -v $vhd
 if ($dismount -eq "1")
     {
-     DS_WriteLog "E" "Failed to dismount vDisk: $vhd" $LogFile
-     Write-Output "Failed to dismount vDisk: $vhd"
+     Write-Host "Failed to dismount vDisk: $vhd"
 	 Read-Host "Press any key to exit"
      BREAK
     }
-DS_WriteLog "I" "Dismounting vDisk: $vhd" $LogFile
-Write-Output "Dismounting vDisk: $vhd"
-Write-Output ""
-DS_WriteLog "I" "Defrag of vDisk: $vhd finished" $LogFile
-Write-Output "Defrag of vDisk: $vhd finished"
+Write-Host "Dismounting vDisk: $vhd"`n
+Write-Host "Defrag of vDisk: $vhd finished"`n
 
 # ========================================================================================================================================
 
@@ -301,65 +258,49 @@ Write-Output "Defrag of vDisk: $vhd finished"
 $tempfile = ($env:TEMP + "\diskpart.txt")
 		
 # Delete temp diskpart file if exists
-DS_WriteLog "I" "Delete temp diskpart file if exists" $LogFile
-Write-Output "Delete temp diskpart file if exists"
-Write-Output ""
-try {
+Write-Host "Delete temp diskpart file if exists"`n
 remove-item $tempfile -ea silentlycontinue
-} catch {
-DS_WriteLog "E" "An error occured while deleting temp file for diskpart commands (error: $($Error[0]))" $LogFile       
-}
 
 # Generate Diskpart commands and create file
-DS_WriteLog "I" "Generate Diskpart commands and creating file" $LogFile
-Write-Output "Generate Diskpart commands and creating file"
-Write-Output ""
-try {
+Write-Host "Generate Diskpart commands and creating file"`n
 Add-Content $tempfile ("select vdisk file=" + '"' + "$vdiskpath\$vhd" + '"')
 Add-Content $tempfile "attach vdisk readonly"
 Add-Content $tempfile "compact vdisk"
 Add-Content $tempfile "detach vdisk"
 Add-Content $tempfile "exit"
-} catch {
-DS_WriteLog "E" "An error occured while generating diskpart commands and creating file (error: $($Error[0]))" $LogFile       
-}
 
 # Generate diskpart command
 $diskpartcommand = ("diskpart.exe /s " + $tempfile)
 # Execute diskpart
-DS_WriteLog "I" "Shrinking vDisk: $vhd" $LogFile
-Write-Output "Shrinking vDisk: $vhd"
-Write-Output ""
-try {
+Write-Host "Shrinking vDisk: $vhd"`n
 $diskpartcommand | cmd.exe 
-} catch {
-DS_WriteLog "E" "An error occured while shrinking vDisk: $vhd (error: $($Error[0]))" $LogFile       
-}
 
 # Dismounting vDisk after shrinking if diskpart can't detach the vDisk
 $dismount = vhddismount -v $vhd
 if ($dismount -eq "1")
     {
-     DS_WriteLog "E" "Failed to dismount vDisk: $vhd" $LogFile
-     Write-Output "Failed to dismount vDisk: $vhd"
+     Write-Host "Failed to dismount vDisk: $vhd"
 	 Read-Host "Press any key to exit"
      BREAK
     }
-DS_WriteLog "I" "Dismounting vDisk: $vhd" $LogFile
-Write-Output "Dismounting vDisk: $vhd"
-Write-Output ""
+Write-Host "Dismounting vDisk: $vhd"`n
+
 
 # Compare PVS vDisk size
 $vhdsizeafter = (Get-ChildItem "$vdiskpath" -Recurse | Where-Object {$_.fullname -like "*.vhdx"} | Sort-Object LastWriteTime | Sort-Object -Descending  | Select-Object -First 1 @{n='Size';e={DisplayInBytes $_.length}}).Size
-DS_WriteLog "I" "Size of vDisk: $vhd before shrinking: $vhdsizebefore - Size of vDisk: $vhd after shrinking: $vhdsizeafter" $LogFile
-Write-Output "Size of vDisk: $vhd before shrinking: $vhdsizebefore - Size of vDisk: $vhd after shrinking: $vhdsizeafter"
+Write-Host "Size of vDisk: $vhd before shrinking: $vhdsizebefore - Size of vDisk: $vhd after shrinking: $vhdsizeafter"`n
 # ========================================================================================================================================
 
-Write-Host -ForegroundColor Green "Ready! vDisk $vDiskName successfully shrinked" `n
+Write-Host -ForegroundColor Green "Ready! vDisk $vDiskName successfully shrinked, check logfile $log" `n
 
 $ScriptEnd = Get-Date
 $ScriptRuntime =  $ScriptEnd - $ScriptStart | Select-Object TotalSeconds
 $ScriptRuntimeInSeconds = $ScriptRuntime.TotalSeconds
 Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSeconds seconds"
+
+# Stop Logging
+Stop-Transcript | Out-Null
+$Content = Get-Content -Path $Log | Select-Object -Skip 18
+Set-Content -Value $Content -Path $Log
 
 Read-Host `n "Press any key to exit"
