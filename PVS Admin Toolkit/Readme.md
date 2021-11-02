@@ -1,5 +1,5 @@
 # Citrix PVS Admin Toolkit
-Useful scripts for your Citrix PVS environment, manage PVS with powershell. Start the main script (PVS Admin Toolkt.ps1) and launch the other scripts from the systray icon.
+Useful scripts for your Citrix PVS environment, manage PVS with powershell. Put all files and folders to "C:\Program Files (x86)\Scripts" and start the main script (PVS Admin Toolkt.ps1). You can launch the other scripts from the systray icon. 
 If you want to change the root folder of the scripts, you have to modify the shortcuts.
 
 ## vDisk Shrink
