@@ -1,4 +1,4 @@
-# Citrix PVS Adminn Toolkit
+# Citrix PVS Admin Toolkit
 Useful scripts for your Citrix PVS environment, manage PVS with powershell.
 
 ## vDisk Shrink
