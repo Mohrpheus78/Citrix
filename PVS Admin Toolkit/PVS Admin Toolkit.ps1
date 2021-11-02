@@ -5,6 +5,9 @@ This script will create a systray icon with a menu to launch the other PVS admin
 .DESCRIPTION
 The purpose of the script is to create a systray icon to launch the PVS admin scripts in the folder "C:\Program Files (x86)\Scripts".
 
+.NOTES
+If you want to change the root folder you have to modify the shortcut. 
+
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-10-27
 Purpose/Change:	

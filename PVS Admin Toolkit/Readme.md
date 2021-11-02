@@ -1,5 +1,6 @@
 # Citrix PVS Admin Toolkit
-Useful scripts for your Citrix PVS environment, manage PVS with powershell.
+Useful scripts for your Citrix PVS environment, manage PVS with powershell. Start the main script (PVS Admin Toolkt.ps1) and launch the other scripts from the systray icon.
+If you want to change the root folder of the scripts, you have to modify the shortcuts.
 
 ## vDisk Shrink
 The script will find all available vDisks and next find out what the latest merged base disk is (VHDX). After that the vDisk gets defragmented and shrinked. At the end you will see the vDisk size before and after shrinking. vDisk can't be in use while executing the script!
