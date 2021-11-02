@@ -20,7 +20,8 @@ vDisk can't be in use while executing the script!
 Run as administrator after you create a new merged base disk that isn't in use yet.
 Tested with UEFI partitions and standard partititions without system reserved partition.
 Sometimes the "detach disk" command from diskpart doesn't work as expected, so the vDisk is still mounted, so the dismount command runs again
-after diskpart
+after diskpart.
+If you want to change the root folder you have to modify the shortcut.
 
 
 Version:		1.1
@@ -68,8 +69,9 @@ function Use-RunAs
 Use-RunAs
 
 # Variables
+$FolderBack = Split-Path -Path $PSScriptRoot
 $Date = Get-Date -UFormat "%d.%m.%Y"
-$Log = "$PSScriptRoot\Shrink PVS vDisk-$Date.log"
+$Log = "$FolderBack\Logs\Shrink PVS vDisk-$Date.log"
 
 # Start logging
 Start-Transcript $Log | Out-Null
@@ -290,7 +292,7 @@ $vhdsizeafter = (Get-ChildItem "$vdiskpath" -Recurse | Where-Object {$_.fullname
 Write-Host "Size of vDisk: $vhd before shrinking: $vhdsizebefore - Size of vDisk: $vhd after shrinking: $vhdsizeafter"`n
 # ========================================================================================================================================
 
-Write-Host -ForegroundColor Green "Ready! vDisk $vDiskName successfully shrinked" `n
+Write-Host -ForegroundColor Green "Ready! vDisk $vDiskName successfully shrinked, check logfile $log" `n
 
 $ScriptEnd = Get-Date
 $ScriptRuntime =  $ScriptEnd - $ScriptStart | Select-Object TotalSeconds
