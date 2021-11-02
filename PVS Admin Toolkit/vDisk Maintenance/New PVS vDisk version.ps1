@@ -10,7 +10,7 @@ The purpose of the script is to create a new vDisk version from a list of availa
 & '.\New PVS vDisk versionn.ps1' or use shortcut
 
 .NOTES
-If you want to change the root folder you have to modify the shortcut and the output path for the report.  
+If you want to change the root folder you have to modify the shortcut.
 
 Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>

@@ -10,6 +10,7 @@ the site that hosts this vDisk if you want. You can also generate a HTML report 
 & '.\Merge PVS vDisk.ps1' or use shortcut
 
 .NOTES
+If you want to change the root folder you have to modify the shortcut.
 
 Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>

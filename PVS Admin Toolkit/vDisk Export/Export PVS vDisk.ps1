@@ -9,7 +9,7 @@ The purpose of the script is to generate y XML backup file to be able to recreat
 & '.\Export PVS vDisk.ps1' or use the shortcut
 
 .NOTES
-If you want to change the root folder you have to modify the shortcut and the output path for the report.  
+If you want to change the root folder you have to modify the shortcut.  
 
 Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>

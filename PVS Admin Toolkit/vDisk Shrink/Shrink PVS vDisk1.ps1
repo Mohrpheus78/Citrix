@@ -20,7 +20,8 @@ vDisk can't be in use while executing the script!
 Run as administrator after you create a new merged base disk that isn't in use yet.
 Tested with UEFI partitions and standard partititions without system reserved partition.
 Sometimes the "detach disk" command from diskpart doesn't work as expected, so the vDisk is still mounted, so the dismount command runs again
-after diskpart
+after diskpart.
+If you want to change the root folder you have to modify the shortcut.
 
 
 Version:		1.1

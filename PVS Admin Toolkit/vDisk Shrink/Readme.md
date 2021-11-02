@@ -5,8 +5,8 @@ The script will find all available vDisks and next find out what the latest merg
 Launch on PVS server: ."Shrik PVS vDisk.ps1" or use the CMD file
     
 ## Notes
-Run as administrator after you create a new merged base disk that isn't in use yet. Tested with UEFI partitions and standard partititions without system reserved partition. Sometimes the "detach disk" command from diskpart doesn't work as expected, so the vDisk is still mounted, so the dismount command runs again after diskpart
-Place the folder with all files inside the folder "C:\Program Files (x86)\Scripts", so that you can use the shortcut.
+Run as administrator after you create a new merged base disk that isn't in use yet. Tested with UEFI partitions and standard partititions without system reserved partition. Sometimes the "detach disk" command from diskpart doesn't work as expected, so the vDisk is still mounted, so the dismount command runs again after diskpart.
+If you want to change the root folder you have to modify the shortcut.
 
 ## Examples
-![Versions](https://github.com/Mohrpheus78/Citrix/blob/main/PVS/vDisk%20Shrink/Images/PVS-Shrink.png)
+![Versions](https://github.com/Mohrpheus78/Citrix/blob/main/PVS%20Admin%20Toolkit/vDisk%20Shrink/Images/PVS-Shrink.png)
