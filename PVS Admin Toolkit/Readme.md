@@ -19,4 +19,4 @@ This script will merge a PVS vDisk you choose.
 ## vDisk Maintenance
 The script will create new vDisk versions and promote these versions to test or production mode.
 
-![Toolkit](https://github.com/Mohrpheus78/Citrix/blob/main/PVS/vDisk%20Documentation/Images/PVSversions.png)
+![Toolkit](https://github.com/Mohrpheus78/Citrix/blob/main/PVS%20Admin%20Toolkit/PVSAdminToolkit.png)
