@@ -239,6 +239,11 @@ Start-Sleep 3
 Start-Process "defrag.exe" -ArgumentList "$FreeDrive /X /G /H /U /V" -wait
 Start-Sleep 3
 
+# Sdelete
+Write-Host "Running sdelete on vDisk: $vhd"`n
+Start-Process "$PSScriptRoot\sdelete64.exe" -ArgumentList "-z -c $FreeDrive" -wait
+Start-Sleep 3
+
 # Dismounting vDisk
 $dismount = vhddismount -v $vhd
 if ($dismount -eq "1")

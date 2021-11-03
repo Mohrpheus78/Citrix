@@ -1,5 +1,5 @@
 # Shrink PVS vDisk
-The script will find all available vDisks and next find out what the latest merged base disk is (VHDX). After that the vDisk gets defragmented and shrinked. At the end you will see the vDisk size before and after shrinking. vDisk can't be in use while executing the script!
+The script will find all available vDisks and next find out what the latest merged base disk is (VHDX). After that the vDisk gets defragmented and shrinked. At the end you will see the vDisk size before and after shrinking. vDisk can't be in use while executing the script! Very useful after cleaning WinSXS folder with BIS-F for example. 
 
 ## Example
 Launch on PVS server: ."Shrik PVS vDisk.ps1" or use the CMD file
