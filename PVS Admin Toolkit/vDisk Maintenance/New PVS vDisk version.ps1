@@ -124,6 +124,11 @@ New-PvsDiskMaintenanceVersion -DiskLocatorName $vDiskName -StoreName $StoreName 
 $MaintVersion = (Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName | Select-Object -First 1).Version
 Write-Host -ForegroundColor Green `n"New Version '$MaintVersion' successfully created, check logfile $log"`n
 
+$ScriptEnd = Get-Date
+$ScriptRuntime =  $ScriptEnd - $ScriptStart | Select-Object TotalSeconds
+$ScriptRuntimeInSeconds = $ScriptRuntime.TotalSeconds
+Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSeconds seconds"
+
 # Stop Logging
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18

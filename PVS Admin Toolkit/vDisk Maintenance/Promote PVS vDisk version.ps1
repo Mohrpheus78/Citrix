@@ -182,6 +182,11 @@ Get-PvsDiskVersion -Name $vDiskName -SiteName $SiteName -StoreName $StoreName | 
 Get-PvsDiskVersion -Name $vDiskName -SiteName $SiteName -StoreName $StoreName | Where-Object {$_.GoodInventoryStatus -eq $false} | Sort-Object -Property Version | ForEach-Object {write-host -foregroundcolor Red ("Version: " + $_.Version + " Replication state: " + $_.GoodInventoryStatus)}
 }
 
+$ScriptEnd = Get-Date
+$ScriptRuntime =  $ScriptEnd - $ScriptStart | Select-Object TotalSeconds
+$ScriptRuntimeInSeconds = $ScriptRuntime.TotalSeconds
+Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSeconds seconds"
+
 # Stop Logging
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
