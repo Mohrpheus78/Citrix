@@ -213,7 +213,7 @@ if ($vDisk.ID -notin $ValidChoices) {
 $vDiskName = $vDisk.Name
 $StoreName = $vDisk.StoreName
 
-$version = ((Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName) | Where-Object {$_.Type -eq '4' -and $_.Access -eq 0} | Select-Object -First 1)
+$version = ((Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName) | Where-Object {$_.Type -eq '4' -or $_.Type -eq '0' -and $_.Access -eq 0} | Select-Object -First 1)
 $vhd = $version.DiskFileName
 $vdiskpath  = (Get-PvsStore -StoreName "$StoreName").Path
 
