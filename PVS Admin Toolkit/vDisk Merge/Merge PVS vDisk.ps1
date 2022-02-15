@@ -58,9 +58,9 @@ Use-RunAs
 
 
 # Variables
-$FolderBack = Split-Path -Path $PSScriptRoot
+$RootFolder = Split-Path -Path $PSScriptRoot
 $Date = Get-Date -UFormat "%d.%m.%Y"
-$Log = "$FolderBack\Logs\Merge PVS vDisks-$Date.log"
+$Log = "$RootFolder\Logs\Merge PVS vDisks.log"
 
 # Start logging
 Start-Transcript $Log | Out-Null
@@ -193,7 +193,7 @@ switch ($choice)
 
 if ($answer -eq 'Yes')
 {
-    & "$FolderBack\vDisk Documentation\PVS vDisk versions.ps1" -outputpath "$ENV:USERPROFILE\Desktop"
+    & "$RootFolder\vDisk Documentation\PVS vDisk versions.ps1" -outputpath "$ENV:USERPROFILE\Desktop"
 }
 
 Write-Host -ForegroundColor Green "Ready! Merged base version is version $LastVersion" `n
@@ -207,5 +207,6 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
+Move-Item $Log "Merge PVS vDisks-$vDiskName-$Date.log" -force
 
 Read-Host "Press any key to exit"

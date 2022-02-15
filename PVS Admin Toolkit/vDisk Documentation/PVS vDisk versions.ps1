@@ -86,9 +86,9 @@ if ($null -eq (Get-PSSnapin "Citrix.PVS.SnapIn" -EA silentlycontinue)) {
 
 Write-Host -ForegroundColor Yellow "PVS vDisk version documentation" `n
 
-$FolderBack = Split-Path -Path $PSScriptRoot
+$RootFolder = Split-Path -Path $PSScriptRoot
 $Date = Get-Date -UFormat "%d.%m.%Y"
-$logfile = Join-Path "$FolderBack\Logs" ("PVS vDisk Version-$Date.log")
+$logfile = Join-Path "$RootFolder\Logs" ("PVS vDisk Version-$Date.log")
 $resultsHTM = Join-Path $outputpath ("PVS vDisk Versions-$Date.htm")
 
 #Header for Table 1 "vDisk Checks"

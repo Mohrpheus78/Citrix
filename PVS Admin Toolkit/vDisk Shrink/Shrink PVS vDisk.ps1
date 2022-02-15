@@ -1,8 +1,3 @@
-# ****************************************************
-# D. Mohrmann, S&L Firmengruppe, Twitter: @mohrpheus78
-# Defrag and shrink PVS vDisk
-# ****************************************************
-
 <#
 .SYNOPSIS
 This script will defrag and shrink the latest merged base PVS vDisk.
@@ -69,9 +64,9 @@ function Use-RunAs
 Use-RunAs
 
 # Variables
-$FolderBack = Split-Path -Path $PSScriptRoot
+$RootFolder = Split-Path -Path $PSScriptRoot
 $Date = Get-Date -UFormat "%d.%m.%Y"
-$Log = "$FolderBack\Logs\Shrink PVS vDisk-$Date.log"
+$Log = "$RootFolder\Logs\Shrink PVS vDisk.log"
 
 # Start logging
 Start-Transcript $Log | Out-Null
@@ -213,11 +208,18 @@ if ($vDisk.ID -notin $ValidChoices) {
 $vDiskName = $vDisk.Name
 $StoreName = $vDisk.StoreName
 
-$version = ((Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName) | Where-Object {$_.Type -eq '4' -or $_.Type -eq '0' -and $_.Access -eq 0} | Select-Object -First 1)
-$vhd = $version.DiskFileName
+$LatestVersion = (Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName).Version | Select-Object -First 1
+$MergedBaseVersion = ((Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName) | Where-Object {$_.Type -eq '4' -and $_.Access -eq 0} | select-Object -First 1)
+IF ($MergedBaseVersion.Version -ne $LatestVersion) {
+    Write-Host -ForegroundColor Red "No actual merged base version found, you select an older merged base version, aborting!"
+    Read-Host "Press any key to exit"
+    BREAK
+    }
+$vhd = $MergedBaseVersion.DiskFileName
 $vdiskpath  = (Get-PvsStore -StoreName "$StoreName").Path
 
-$vhdsizebefore = (Get-ChildItem "$vdiskpath" -Recurse | Where-Object {$_.fullname -like "*.vhdx"} | Sort-Object LastWriteTime | Sort-Object -Descending  | Select-Object -First 1 @{n='Size';e={DisplayInBytes $_.length}}).Size
+# $vhdsizebefore = (Get-ChildItem "$vdiskpath" -Recurse | Where-Object {$_.fullname -like "*.vhdx"} | Sort-Object LastWriteTime | Sort-Object -Descending  | Select-Object -First 1 @{n='Size';e={DisplayInBytes $_.length}}).Size
+$vhdsizebefore = "{0:N0} MB" -f (((Get-ChildItem "$vdiskpath" -Recurse | Where-Object {$_.fullname -like "*.vhdx"} | Sort-Object LastWriteTime | Sort-Object -Descending  | Select-Object -First 1) | measure Length -s).Sum /1MB)
 
 # Get next free drive
 $FreeDrive = Get-NextFreeDriveLetter 
@@ -293,7 +295,8 @@ Write-Host "Dismounting vDisk: $vhd"`n
 
 
 # Compare PVS vDisk size
-$vhdsizeafter = (Get-ChildItem "$vdiskpath" -Recurse | Where-Object {$_.fullname -like "*.vhdx"} | Sort-Object LastWriteTime | Sort-Object -Descending  | Select-Object -First 1 @{n='Size';e={DisplayInBytes $_.length}}).Size
+# $vhdsizeafter = (Get-ChildItem "$vdiskpath" -Recurse | Where-Object {$_.fullname -like "*.vhdx"} | Sort-Object LastWriteTime | Sort-Object -Descending  | Select-Object -First 1 @{n='Size';e={DisplayInBytes $_.length}}).Size
+$vhdsizeafter = "{0:N0} MB" -f (((Get-ChildItem "$vdiskpath" -Recurse | Where-Object {$_.fullname -like "*.vhdx"} | Sort-Object LastWriteTime | Sort-Object -Descending  | Select-Object -First 1) | measure Length -s).Sum /1MB)
 Write-Host "Size of vDisk: $vhd before shrinking: $vhdsizebefore - Size of vDisk: $vhd after shrinking: $vhdsizeafter"`n
 # ========================================================================================================================================
 
@@ -308,5 +311,6 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
+Move-Item $Log "Shrink PVS vDisk-$vDiskName-$Date.log" -Force
 
 Read-Host `n "Press any key to exit"

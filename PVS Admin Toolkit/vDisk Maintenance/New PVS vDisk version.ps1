@@ -59,9 +59,9 @@ Use-RunAs
 
 
 # Variables
-$FolderBack = Split-Path -Path $PSScriptRoot
+$RootFolder = Split-Path -Path $PSScriptRoot
 $Date = Get-Date -UFormat "%d.%m.%Y"
-$Log = "$FolderBack\Logs\New PVS vDisk version-$Date.log"
+$Log = "$RootFolder\Logs\New PVS vDisk version.log"
 
 # Start logging
 Start-Transcript $Log | Out-Null
@@ -75,9 +75,9 @@ if ($null -eq (Get-PSSnapin "Citrix.PVS.SnapIn" -EA silentlycontinue)) {
 	}
 	catch {
 		write-error "Error loading Citrix.PVS.SnapIn PowerShell snapin"; Return }
-	}
+}
 
-# Merge vDisks
+# New version
 Write-Host -ForegroundColor Yellow "New vDisk version" `n
 
 # Get PVS SiteName
@@ -93,23 +93,24 @@ $AllvDisks | ForEach-Object {
     $ID += 1
     }
 
-# Show menu to select vDisk
-Write-Host "Available vDisks:" `n 
-$ValidChoices = 1..($AllvDisks.Count)
-$Menu = $AllvDisks | ForEach-Object {(($_.ID).toString() + "." + " " +  $_.Name + " " + "-" + " " + "Storename:" + " " + $_.Storename)}
-$Menu | Out-Host
-Write-Host
-$vDisk = Read-Host -Prompt 'Select vDisk'
+IF (-not(Test-Path variable:Task) -or $Task -eq $false) {
+	# Show menu to select vDisk
+	Write-Host "Available vDisks:" `n 
+	$ValidChoices = 1..($AllvDisks.Count)
+	$Menu = $AllvDisks | ForEach-Object {(($_.ID).toString() + "." + " " +  $_.Name + " " + "-" + " " + "Storename:" + " " + $_.Storename)}
+	$Menu | Out-Host
+	Write-Host
+	$vDisk = Read-Host -Prompt 'Select vDisk'
 
-$vDisk = $AllvDisks | Where-Object {$_.ID -eq $vDisk}
-if ($vDisk.ID -notin $ValidChoices) {
-    Write-Host -ForegroundColor Red "Selected vDisk not found, aborting!"
-	Read-Host "Press any key to exit"
-    BREAK
-    }
-
-$vDiskName = $vDisk.Name
-$StoreName = $vDisk.StoreName
+	$vDisk = $AllvDisks | Where-Object {$_.ID -eq $vDisk}
+	if ($vDisk.ID -notin $ValidChoices) {
+		Write-Host -ForegroundColor Red "Selected vDisk not found, aborting!"
+		Read-Host "Press any key to exit"
+		BREAK
+		}
+	$vDiskName = $vDisk.Name
+	$StoreName = $vDisk.StoreName
+}
 
 # Create new vDisk version if possible
 $CanPromote = ((Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName) | Select-Object -First 1).CanPromote
@@ -117,21 +118,48 @@ if ($CanPromote) {
     Write-Host -ForegroundColor Red "Current vDisk version is alreadey a in maintenance mode, aborting!"
 	Read-Host "Press any key to exit"
     BREAK
-    }
+}
 
 # New maintenance version
 New-PvsDiskMaintenanceVersion -DiskLocatorName $vDiskName -StoreName $StoreName -SiteName $SiteName | Out-Null
 $MaintVersion = (Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName | Select-Object -First 1).Version
-Write-Host -ForegroundColor Green `n"New Version '$MaintVersion' successfully created, check logfile $log"`n
+Write-Host -ForegroundColor Green `n"New Version '$MaintVersion' successfully created, check logfile '$log'"`n
 
+# Stop Logging
 $ScriptEnd = Get-Date
 $ScriptRuntime =  $ScriptEnd - $ScriptStart | Select-Object TotalSeconds
 $ScriptRuntimeInSeconds = $ScriptRuntime.TotalSeconds
-Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSeconds seconds"
+Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSeconds seconds"`n
 
-# Stop Logging
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
+Move-Item $Log "New PVS vDisk version-$vDiskName-Version $MaintVersion-$Date.log" -Force
+
+# Start Master VM? Default Yes if doing Windows Updates
+IF ($WindowsUpdates -ne "Yes") {
+	$title = ""
+	$message = "Do you want to start the master VM?"
+	$yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes"
+	$no = New-Object System.Management.Automation.Host.ChoiceDescription "&No"
+	$options = [System.Management.Automation.Host.ChoiceDescription[]]($yes, $no)
+	$choice=$host.ui.PromptForChoice($title, $message, $options, 0)
+
+	switch ($choice) {
+		0 {
+		$answer = 'Yes'       
+		}
+		1 {
+		$answer = 'No'
+		}
+	}
+
+	if ($answer -eq 'Yes') {
+		."$PSScriptRoot\Start Master.ps1"
+	}
+}
+Else {
+	."$PSScriptRoot\Start Master.ps1"
+}
 
 Read-Host "Press any key to exit"

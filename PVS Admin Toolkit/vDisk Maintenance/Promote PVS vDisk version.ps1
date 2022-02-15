@@ -58,9 +58,9 @@ Use-RunAs
 
 
 # Variables
-$FolderBack = Split-Path -Path $PSScriptRoot
+$RootFolder = Split-Path -Path $PSScriptRoot
 $Date = Get-Date -UFormat "%d.%m.%Y"
-$Log = "$FolderBack\Logs\Promote PVS vDisk version-$Date.log"
+$Log = "$RootFolder\Logs\Promote PVS vDisk version.log"
 
 # Start logging
 Start-Transcript $Log | Out-Null
@@ -77,7 +77,7 @@ if ($null -eq (Get-PSSnapin "Citrix.PVS.SnapIn" -EA silentlycontinue)) {
 	}
 
 # Merge vDisks
-Write-Host -ForegroundColor Yellow "New vDisk version" `n
+Write-Host -ForegroundColor Yellow "Promote vDisk version" `n
 
 # Get PVS SiteName
 $SiteName = (Get-PvsSite).SiteName
@@ -120,9 +120,10 @@ if (-not($CanPromote)) {
 
 # Get maintenance version
 $MaintVersion = (Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName | Where-Object {$_.CanPromote -eq 'True'}).Version
+Write-Host `n
 
 # Production or test mode?
-$title = "Promote vDisks"
+$title = ""
 $message = "Do you want to promote to production or test mode?"
 $Prod = New-Object System.Management.Automation.Host.ChoiceDescription "&P"
 $Test = New-Object System.Management.Automation.Host.ChoiceDescription "&T"
@@ -149,10 +150,10 @@ Write-Host -ForegroundColor Yellow `n"Please enter a description for the new vDi
 $Description =  Read-Host
 Set-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName -Version $MaintVersion -Description "$Description"
 
-Write-Host -ForegroundColor Green `n"vDisk successfully promoted to version '$MaintVersion' with description '$Description', check logfile $log"`n
+Write-Host -ForegroundColor Green `n"vDisk successfully promoted to version '$MaintVersion' with description '$Description', check logfile"`n
 
 # Replicate vDisk to all PVS server in store
-$title = "Replicate vDisks"
+$title = ""
 $message = "Do you want to replicate the new vDisk version?"
 $yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes"
 $no = New-Object System.Management.Automation.Host.ChoiceDescription "&No"
@@ -182,14 +183,15 @@ Get-PvsDiskVersion -Name $vDiskName -SiteName $SiteName -StoreName $StoreName | 
 Get-PvsDiskVersion -Name $vDiskName -SiteName $SiteName -StoreName $StoreName | Where-Object {$_.GoodInventoryStatus -eq $false} | Sort-Object -Property Version | ForEach-Object {write-host -foregroundcolor Red ("Version: " + $_.Version + " Replication state: " + $_.GoodInventoryStatus)}
 }
 
+# Stop Logging
 $ScriptEnd = Get-Date
 $ScriptRuntime =  $ScriptEnd - $ScriptStart | Select-Object TotalSeconds
 $ScriptRuntimeInSeconds = $ScriptRuntime.TotalSeconds
 Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSeconds seconds"
 
-# Stop Logging
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
+Move-Item $Log "Promote PVS vDisk version-$vDiskName-$Date.log" -force
 
 Read-Host "Press any key to exit"

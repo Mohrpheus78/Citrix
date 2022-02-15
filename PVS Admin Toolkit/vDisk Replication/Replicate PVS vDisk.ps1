@@ -57,8 +57,9 @@ Use-RunAs
 
 
 # Variables
+$RootFolder = Split-Path -Path $PSScriptRoot
 $Date = Get-Date -UFormat "%d.%m.%Y"
-$Log = "$PSScriptRoot\Replicate PVS vDisks-$Date.log"
+$Log = "$RootFolder\Replicate PVS vDisks.log"
 
 # Start logging
 Start-Transcript $Log | Out-Null
@@ -130,8 +131,8 @@ Get-PvsDiskVersion -Name $vDiskName -SiteName $SiteName -StoreName $StoreName | 
 Get-PvsDiskVersion -Name $vDiskName -SiteName $SiteName -StoreName $StoreName | Where-Object {$_.GoodInventoryStatus -eq $false} | Sort-Object -Property Version | ForEach-Object {write-host -foregroundcolor Red ("Version: " + $_.Version + " Replication state: " + $_.GoodInventoryStatus)}
 
 Write-Host -ForegroundColor Green `n"Ready! vDisk $vDiskName replicated" `n
-
 }
+
 else {
     Write-Host -ForegroundColor Green "All vDisk versions replicated, no replication needed!"
     }
@@ -145,6 +146,7 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
+Move-Item $Log "Replicate PVS vDisks-$vDiskName-$Date.log" -force
 
 Read-Host `n "Press any key to exit"
 

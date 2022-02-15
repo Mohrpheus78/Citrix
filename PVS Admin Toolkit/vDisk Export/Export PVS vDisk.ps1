@@ -53,9 +53,9 @@ function Use-RunAs
 Use-RunAs
 
 # Variables
-$FolderBack = Split-Path -Path $PSScriptRoot
+$RootFolder = Split-Path -Path $PSScriptRoot
 $Date = Get-Date -UFormat "%d.%m.%Y"
-$Log = "$FolderBack\Logs\Export PVS vDisks-$Date.log"
+$Log = "$RootFolder\Logs\Export PVS vDisks-$Date.log"
 
 # Start logging
 Start-Transcript $Log | Out-Null
@@ -85,4 +85,4 @@ Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
 
-Read-Host `n "Press any key to exit"
+Read-Host `n "Press ENTER to exit"
