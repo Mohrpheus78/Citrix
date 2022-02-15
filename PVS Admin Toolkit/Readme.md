@@ -1,14 +1,11 @@
 # Citrix PVS Admin Toolkit
 Useful scripts for your Citrix PVS environment, manage PVS with powershell.
-- Put all files and folders to "C:\Program Files (x86)\PVS Admin Toolkit" on your PVS servers
-- Start the main script (PVS Admin Toolkit.ps1)
-- Launch all the other tasks from the systray icon
-- If you want to change the root folder of the scripts, you have to modify the shortcuts
+Put all files and folders to "C:\Program Files (x86)\PVS Admin Toolkit" on your PVS servers, start the main script (PVS Admin Toolkit.ps1) and launch all the other tasks from the systray icon. If you want to change the root folder of the cripts, you have to modify the shortcuts.
 
-1. Configure your hypervisor, start "Hypervisor configuration" from the PVS Toolkit Configuration menu. Enter a IP address or hostname of your Citrix Xen host, VMWare vCenter/ESXi or Nutanix cluster.
-2. Configure your PVS environment, start "PVS configuration" from the PVS Toolkit Configuration menu and answer the queastions. 
+1. Configure your hypervisor, start "Hypervisor configuration" from the PVS Toolkit Configuration menu. Enter a IP address or hostname of your Citrix Xen host, VMWare vCenter/ESXi or Nutanix cluster and enter valid admin credentials to connect to the hypervisor
+2. Launch "PVS configuration" from the PVS Toolkit Configuration menu to configure your PVS environment
 3. Install the Powershell modules for your choosen hypervisor on your PVS server (Citrix XenServer SDK, VMWare Power.CLI or Nutanix.CLI )
-4. If you want to install Windows Updates inside your vDisk install the PSWindowsUpdate Powershell module on your PVS master
+4. If you want to install Windows Updates inside your vDisk, first install the "PSWindowsUpdate" Powershell module on your PVS master
 
 All values will be stored in XML files to be used as variables. Credentials will be encrypted and can only be used by the same user again. 
 
