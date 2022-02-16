@@ -8,8 +8,6 @@ The purpose of the script is to remotely install Windows Updates
 
 
 .NOTES
-
-Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2022-02-06
 Purpose/Change:	

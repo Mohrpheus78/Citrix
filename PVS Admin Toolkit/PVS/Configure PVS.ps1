@@ -6,17 +6,16 @@ This script will configure a PVS maintenance device
 The purpose of the script is to define a PVS maintenance device if the VM name on the hypervisor is different to the Windows hostname 
 
 .NOTES
-
-Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>
-Creation Date:  2022-02-06
-Purpose/Change:	
-2022-02-06		Inital version
+Creation Date:  2022-02-16
 #>
 
 # Variables
 $PVSConfig = "$PSScriptRoot\PVS.xml"
 $PVSSelection = New-Object PSObject
+
+Write-Host "======== PVS configuration ========"
+Write-Host `n
 
 # VM name of PVS maintenance device
 $title = ""
@@ -99,8 +98,8 @@ $choice=$host.ui.PromptForChoice($title, $message, $options, 0)
 		}
 	
 		if ($StreamingService -eq 'Yes') {
+			Write-Host -Foregroundcolor Yellow "Registry value 'HKLM\SOFTWARE\Citrix\ProvisioningServices\StreamProcess\SkipBootMenu' set to '1', restarting PVS Streaming service!"
 			Restart-Service -Name StreamService -Force
-			Write-Host -Foregroundcolor Yellow "Registry value 'HKLM\SOFTWARE\Citrix\ProvisioningServices\StreamProcess\SkipBootMenu' set to '1' and PVS Streaming service successfully restarted"
 			}
 	}
 Write-Host `n

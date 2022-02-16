@@ -16,7 +16,6 @@ The path where the report is saved, default is "C:\Program Files (x86)\Scripts\v
 The script is based on the excellent PVS Health Check script from Sacha Thomet (@sacha81): https://github.com/sacha81/citrix-pvs-healthcheck/blob/master/Citrix-PVS-Farm-Health-toHTML_Parameters.xml
 I used most of the code and added the decription, there is also no need of the XML file. If you want to change the root folder you have to modify the shortcut and the output path for the report.  
 
-Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-10-16
 Purpose/Change:	

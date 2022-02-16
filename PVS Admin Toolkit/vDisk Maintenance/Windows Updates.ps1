@@ -6,14 +6,9 @@ windows updates will continue to run until no more updates are available.
 .DESCRIPTION
 The purpose of the script is to remotely install Windows Updates
 
-
 .NOTES
-
-Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>
-Creation Date:  2022-02-06
-Purpose/Change:	
-2022-02-06		Inital version
+Creation Date:  2022-02-16
 #>
 
 # Variables

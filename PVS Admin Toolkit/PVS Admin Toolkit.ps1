@@ -12,7 +12,7 @@ Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-10-27
 Purpose/Change:	
 2021-10-30		Inital version
-2022-02-06		Added WIndows Updates and configuration menu
+2022-02-16		Added WIndows Updates and configuration menu
 #>
 
 # Force garbage collection just to start slightly lower RAM usage

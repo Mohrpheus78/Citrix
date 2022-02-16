@@ -11,12 +11,11 @@ The script will first ask you about admin credentials to import the task and cre
 .NOTES
 Run as administrator! If you want to change the root folder you have to modify the shortcut.
 
-
-Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-11-18
 Purpose/Change:	
 2021-11-18		Inital version
+2022-02-16		Added vDisk menu
 #>
 
 Write-Host -Foregroundcolor Yellow "Create a scheduled task to automatically install Windows Updates on your PVS vDisk"`n

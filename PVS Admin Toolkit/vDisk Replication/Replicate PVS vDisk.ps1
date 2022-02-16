@@ -12,7 +12,6 @@ The purpose of the script is to replicate vDisk versions to all other PVS server
 If you want to change the root folder you have to modify the shortcut.
 
 .NOTES
-Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-10-27
 Purpose/Change:	

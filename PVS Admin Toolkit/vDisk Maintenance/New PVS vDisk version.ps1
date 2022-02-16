@@ -5,23 +5,20 @@ This script will create a new PVS maintenance version from the vDisk you choose.
 .DESCRIPTION
 The purpose of the script is to create a new vDisk version from a list of available vDisk in your site.
 
-
 .EXAMPLE
 & '.\New PVS vDisk versionn.ps1' or use shortcut
 
 .NOTES
 If you want to change the root folder you have to modify the shortcut.
 
-Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-10-16
 Purpose/Change:	
 2021-10-16		Inital version
 2021-10-26		changes to menu
 2021-10-27		changed description
-
+2022-02-16		added Nutanix
 #>
-
 
 # RunAs Admin
 function Use-RunAs 

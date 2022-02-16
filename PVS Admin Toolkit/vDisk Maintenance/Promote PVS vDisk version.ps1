@@ -12,7 +12,6 @@ The purpose of the script is to create a new vDisk version from a list of availa
 .NOTES
 If you want to change the root folder you have to modify the shortcut.
 
-Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-10-16
 Purpose/Change:	

@@ -18,8 +18,6 @@ Sometimes the "detach disk" command from diskpart doesn't work as expected, so t
 after diskpart.
 If you want to change the root folder you have to modify the shortcut.
 
-
-Version:		1.1
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-10-16
 Purpose/Change:	

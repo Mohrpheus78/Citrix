@@ -12,7 +12,6 @@ the site that hosts this vDisk if you want. You can also generate a HTML report 
 .NOTES
 If you want to change the root folder you have to modify the shortcut.
 
-Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-10-16
 Purpose/Change:	
