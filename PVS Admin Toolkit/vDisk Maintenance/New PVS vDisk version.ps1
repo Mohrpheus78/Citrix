@@ -5,6 +5,7 @@ This script will create a new PVS maintenance version from the vDisk you choose.
 .DESCRIPTION
 The purpose of the script is to create a new vDisk version from a list of available vDisk in your site.
 
+
 .EXAMPLE
 & '.\New PVS vDisk versionn.ps1' or use shortcut
 
@@ -13,12 +14,8 @@ If you want to change the root folder you have to modify the shortcut.
 
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-10-16
-Purpose/Change:	
-2021-10-16		Inital version
-2021-10-26		changes to menu
-2021-10-27		changed description
-2022-02-16		added Nutanix
 #>
+
 
 # RunAs Admin
 function Use-RunAs 
@@ -81,6 +78,7 @@ Write-Host -ForegroundColor Yellow "New vDisk version" `n
 $SiteName = (Get-PvsSite).SiteName
 
 # Get all vDisks
+IF (-not(Test-Path variable:Task) -or $Task -eq $false) {
 $AllvDisks = Get-PvsDiskInfo -SiteName $SiteName
 
 # Add property "ID" to object
@@ -90,7 +88,7 @@ $AllvDisks | ForEach-Object {
     $ID += 1
     }
 
-IF (-not(Test-Path variable:Task) -or $Task -eq $false) {
+
 	# Show menu to select vDisk
 	Write-Host "Available vDisks:" `n 
 	$ValidChoices = 1..($AllvDisks.Count)
@@ -112,8 +110,10 @@ IF (-not(Test-Path variable:Task) -or $Task -eq $false) {
 # Create new vDisk version if possible
 $CanPromote = ((Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName) | Select-Object -First 1).CanPromote
 if ($CanPromote) {
-    Write-Host -ForegroundColor Red "Current vDisk version is alreadey a in maintenance mode, aborting!"
+    Write-Host -ForegroundColor Red "Current vDisk version is alreadey a in 'Maintenance' mode or in 'Test' mode, aborting!"
+	IF (-not(Test-Path variable:Task) -or $Task -eq $false) {
 	Read-Host "Press any key to exit"
+	}
     BREAK
 }
 
@@ -131,10 +131,11 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Move-Item $Log "New PVS vDisk version-$vDiskName-Version $MaintVersion-$Date.log" -Force
+Copy-Item -Path $Log -Destination "$RootFolder\Logs\New PVS vDisk version-$vDiskName-Version $MaintVersion-$Date.log" -Force
+Remove-Item $Log -Force
 
 # Start Master VM? Default Yes if doing Windows Updates
-IF ($WindowsUpdates -ne "Yes") {
+IF (-not(Test-Path variable:Task) -or $Task -eq $false) {
 	$title = ""
 	$message = "Do you want to start the master VM?"
 	$yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes"
@@ -156,7 +157,10 @@ IF ($WindowsUpdates -ne "Yes") {
 	}
 }
 Else {
+	Write-Host "direkt starten"
 	."$PSScriptRoot\Start Master.ps1"
 }
 
-Read-Host "Press any key to exit"
+IF (-not(Test-Path variable:Task) -or $Task -eq $false) {
+	Read-Host "Press any key to exit"
+}

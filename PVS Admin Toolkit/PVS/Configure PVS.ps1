@@ -6,8 +6,12 @@ This script will configure a PVS maintenance device
 The purpose of the script is to define a PVS maintenance device if the VM name on the hypervisor is different to the Windows hostname 
 
 .NOTES
+
+Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>
-Creation Date:  2022-02-16
+Creation Date:  2022-02-06
+Purpose/Change:	
+2022-02-06		Inital version
 #>
 
 # Variables

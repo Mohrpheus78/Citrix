@@ -18,6 +18,8 @@ Sometimes the "detach disk" command from diskpart doesn't work as expected, so t
 after diskpart.
 If you want to change the root folder you have to modify the shortcut.
 
+
+Version:		1.1
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-10-16
 Purpose/Change:	
@@ -309,6 +311,7 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Move-Item $Log "Shrink PVS vDisk-$vDiskName-$Date.log" -Force
+Copy-Item -Path $Log -Destination "$RootFolder\Shrink PVS vDisk-$vDiskName-$Date.log" -Force
+Remove-Item $Log -force
 
 Read-Host `n "Press any key to exit"

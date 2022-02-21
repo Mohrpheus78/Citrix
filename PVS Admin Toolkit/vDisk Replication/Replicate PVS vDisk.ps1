@@ -12,6 +12,7 @@ The purpose of the script is to replicate vDisk versions to all other PVS server
 If you want to change the root folder you have to modify the shortcut.
 
 .NOTES
+Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-10-27
 Purpose/Change:	
@@ -145,7 +146,8 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Move-Item $Log "Replicate PVS vDisks-$vDiskName-$Date.log" -force
+Copy-Item -Path $Log -Destination "$RootFolder\Replicate PVS vDisks-$vDiskName-$Date.log" -force
+Remove-Item $Log -force
 
 Read-Host `n "Press any key to exit"
 

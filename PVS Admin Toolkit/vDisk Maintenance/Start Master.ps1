@@ -3,10 +3,10 @@
 This script will start a PVS master from a new vDIsk version
 	
 .DESCRIPTION
-The purpose of the script is to start a PVS master on y hypervisor you defined earlier and to boot it from a new vDisk version
+The purpose of the script is to start a PVS master on a hypervisor you defined earlier and to boot it from a new vDisk version
 
 .NOTES
-The variables have to be present in the text files, configure your hypervisor with the configuration menu first!
+The variables have to be present in the XML files, configure your hypervisor with the configuration menu first!
 
 Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>
@@ -199,15 +199,18 @@ $ScriptEnd = Get-Date
 $ScriptRuntime =  $ScriptEnd - $ScriptStart | Select-Object TotalSeconds
 $ScriptRuntimeInSeconds = $ScriptRuntime.TotalSeconds
 Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSeconds seconds" `n
-
-Stop-Transcript | Out-Null
+Stop-Transcript #| Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Move-Item $Log "Start-Master-VM-$MaintDeviceName-$Date.log" -Force
-
+Copy-Item -Path $Log -Destination "$RootFolder\Logs\Start-Master-VM-$MaintDeviceName-$Date.log" -Force
+Remove-Item $Log -force
 
 # Install Windows Updates
 IF ($WindowsUpdates -eq "Yes") {
 	."$PSScriptRoot\Windows Updates.ps1"
 	}
 
+# Launch Evergreen
+IF ($Evergreen -eq "Yes") {
+	."$PSScriptRoot\Evergreen.ps1"
+	}

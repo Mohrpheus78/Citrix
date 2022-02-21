@@ -6,10 +6,12 @@ This script will configure a hypervisor and the appropriate admin account to con
 The purpose of the script is to configure a hypervisor an admin account with a password and store this information in text files, the password is encrypted
 
 .NOTES
+
 Author:         Dennis Mohrmann <@mohrpheus78>
-Creation Date:  2022-02-16
+Creation Date:  2022-02-06
 #>
 
+# Show Menu
 function Show-Menu
 {
     param (

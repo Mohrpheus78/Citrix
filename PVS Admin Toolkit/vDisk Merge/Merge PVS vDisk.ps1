@@ -12,6 +12,7 @@ the site that hosts this vDisk if you want. You can also generate a HTML report 
 .NOTES
 If you want to change the root folder you have to modify the shortcut.
 
+Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-10-16
 Purpose/Change:	
@@ -206,6 +207,7 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Move-Item $Log "Merge PVS vDisks-$vDiskName-$Date.log" -force
+Copy-Item -Path $Log -Destination "$RootFolder\Merge PVS vDisks-$vDiskName-$Date.log" -force
+Remove-Item $Log -force
 
 Read-Host "Press any key to exit"

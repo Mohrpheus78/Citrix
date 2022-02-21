@@ -18,12 +18,6 @@ I used most of the code and added the decription, there is also no need of the X
 
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-10-16
-Purpose/Change:	
-2021-10-16		Inital version
-2021-10-17		changed HTML style
-2021-10-18		added parameters and vDisk type
-2021-11-01		added RunAs Admin function
-2021-11-02		Changed log path and notes
 #>
 
 [CmdletBinding()]
@@ -97,7 +91,7 @@ $vDiskheaderWidths = "auto","auto","auto","auto","auto","auto","auto","auto"
 $vDisktablewidth = "1400"
  
 #==============================================================================================
-#log function
+#Log Function
 function LogMe() {
     Param(
     [parameter(Mandatory = $true, ValueFromPipeline = $true)] $logEntry,

@@ -14,10 +14,6 @@ If you want to change the root folder you have to modify the shortcut.
 
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-10-16
-Purpose/Change:	
-2021-10-16		Inital version
-2021-10-26		changes to menu
-2021-10-27		changed description
 #>
 
 
@@ -191,6 +187,7 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Move-Item $Log "Promote PVS vDisk version-$vDiskName-$Date.log" -force
+Copy-Item -Path $Log -Destination "$RootFolder\Logs\Promote PVS vDisk version-$vDiskName-$Date.log" -force
+Remove-Item $Log -force
 
 Read-Host "Press any key to exit"

@@ -11,10 +11,8 @@ The purpose of the script is to generate y XML backup file to be able to recreat
 .NOTES
 If you want to change the root folder you have to modify the shortcut.  
 
-Version:		1.0
 Author:         Dennis Mohrmann <@mohrpheus78>
-2021-11-01		added RunAs Admin function
-2021-11-02		Changed log path and notes
+Creation Date:  2021-11-06
 #>
 
 

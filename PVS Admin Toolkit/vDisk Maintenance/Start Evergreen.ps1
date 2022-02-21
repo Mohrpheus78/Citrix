@@ -1,17 +1,18 @@
 <#
 .SYNOPSIS
-This script will launch the "New PVS vDisk script", start the master and launch the Windows Update script to automatically install all avaialable windows updates on a device and will automatically reboot if needed.
-After reboot Windows updates will continue to run until no more updates are available.
+This script will launch the "New PVS vDisk script", start the master and execute the Evergreen software update script to install software updates inside the a new vDisk version
 
 .DESCRIPTION
-The purpose of the script is to launch the Windows Update script
+The purpose of the script is to launch other scripts to execute Evergreen inside a new vDisk version
+
 
 .NOTES
+The variables have to be present in the XML files, configure Evergreen with the configuration menu first!
 
 Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2022-02-06
 Purpose/Change:	
-2022-02-06		Inital version
+2022-02-17		Inital version
 #>
 
 param
@@ -32,8 +33,7 @@ param
 # Variables
 $Date = Get-Date -UFormat "%d.%m.%Y"
 $RootFolder = Split-Path -Path $PSScriptRoot
-$Log = "$RootFolder\Logs\Start Windows Updates.log"
-#$WindowsUpdates = "Yes"
+$Log = "$RootFolder\Logs\Start Evergreen.log"
 
 # Start logging
 Start-Transcript $Log | Out-Null
@@ -73,12 +73,12 @@ function Use-RunAs
 Use-RunAs
 
 # Launch script
-Write-Host -ForegroundColor Yellow "Installing Windows Updates into a maintenance version" `n
+Write-Host -ForegroundColor Yellow "Executing Evergreen script inside a maintenance version" `n
 ."$PSScriptRoot\New PVS vDisk version.ps1"
 
 # Stop Logging
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Copy-Item -Path $Log -Destination "$RootFolder\Windows Updates-$MaintDeviceName-$Date.log" -force
-Remove-Item $Log -Force
+Copy-Item -Path $Log -Destination "$RootFolder\Logs\Start-Evergreen-$Date.log" -force
+Remove-Item $Log -force

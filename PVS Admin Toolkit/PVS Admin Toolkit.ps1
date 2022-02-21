@@ -12,7 +12,8 @@ Author:         Dennis Mohrmann <@mohrpheus78>
 Creation Date:  2021-10-27
 Purpose/Change:	
 2021-10-30		Inital version
-2022-02-16		Added WIndows Updates and configuration menu
+2022-02-06		Added Windows Updates and configuration menu
+2022-02-18		Added Evergreen
 #>
 
 # Force garbage collection just to start slightly lower RAM usage
@@ -53,20 +54,23 @@ $Menu_3.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Maintenan
 $Menu_4 = $contextmenu.Items.Add("Windows Update");
 $Menu_4.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Maintenance\Windows Update.png")
 
-$Menu_5 = $contextmenu.Items.Add("Document vDisk versions");
-$Menu_5.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Documentation\PVS vDisk versions.png")
+$Menu_5 = $contextmenu.Items.Add("Evergreen");
+$Menu_5.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\Evergreen\Evergreen.png")
 
-$Menu_6 = $contextmenu.Items.Add("Merge vDisk");
-$Menu_6.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Merge\Merge PVS vDisk.png")
+$Menu_6 = $contextmenu.Items.Add("Document vDisk versions");
+$Menu_6.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Documentation\PVS vDisk versions.png")
 
-$Menu_7 = $contextmenu.Items.Add("Replicate vDisk");
-$Menu_7.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Replication\Replicate PVS vDisk.png")
+$Menu_7 = $contextmenu.Items.Add("Merge vDisk");
+$Menu_7.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Merge\Merge PVS vDisk.png")
 
-$Menu_8 = $contextmenu.Items.Add("Export all vDisks (XML)");
-$Menu_8.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Export\Export PVS vDisk.png")
+$Menu_8 = $contextmenu.Items.Add("Replicate vDisk");
+$Menu_8.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Replication\Replicate PVS vDisk.png")
 
-$Menu_9 = $contextmenu.Items.Add("Shrink vDisk");
-$Menu_9.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Shrink\Shrink PVS vDisk.png")
+$Menu_9 = $contextmenu.Items.Add("Export all vDisks (XML)");
+$Menu_9.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Export\Export PVS vDisk.png")
+
+$Menu_10 = $contextmenu.Items.Add("Shrink vDisk");
+$Menu_10.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Shrink\Shrink PVS vDisk.png")
 
 $Menu_Exit = $contextmenu.Items.Add("Exit");
 $Menu_Exit.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\Exit.png")
@@ -81,6 +85,11 @@ $Menu1_SubMenu2 = New-Object System.Windows.Forms.ToolStripMenuItem
 $Menu1_SubMenu2.Text = "PVS configuration"
 $Menu1_SubMenu2.Image = $Icon
 $Menu_1.DropDownItems.Add($Menu1_SubMenu2)
+
+$Menu1_SubMenu3 = New-Object System.Windows.Forms.ToolStripMenuItem
+$Menu1_SubMenu3.Text = "Evergreen configuration"
+$Menu1_SubMenu3.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\Evergreen\Evergreen.png")
+$Menu_1.DropDownItems.Add($Menu1_SubMenu3)
 
 #Sub menus for Menu 3
 $Menu3_SubMenu1 = New-Object System.Windows.Forms.ToolStripMenuItem
@@ -104,6 +113,17 @@ $Menu4_SubMenu2.Text = "Import scheduled tasks for Windows Update"
 $Menu4_SubMenu2.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Maintenance\Scheduled Task.png")
 $Menu_4.DropDownItems.Add($Menu4_SubMenu2)
 
+#Sub menu for Menu 5
+$Menu5_SubMenu1 = New-Object System.Windows.Forms.ToolStripMenuItem
+$Menu5_SubMenu1.Text = "Launch Evergreen script on vDisk"
+$Menu5_SubMenu1.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\Evergreen\Evergreen.png")
+$Menu_5.DropDownItems.Add($Menu5_SubMenu1)
+
+$Menu5_SubMenu2 = New-Object System.Windows.Forms.ToolStripMenuItem
+$Menu5_SubMenu2.Text = "Import scheduled tasks for executing Evergreen"
+$Menu5_SubMenu2.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Maintenance\Scheduled Task.png")
+$Menu_5.DropDownItems.Add($Menu5_SubMenu2)
+
 # Add the context menu object to the main systray tool object
 $Systray_Tool_Icon.ContextMenuStrip = $contextmenu;
 
@@ -118,6 +138,11 @@ $Menu1_SubMenu2.add_Click({
 	start-process powershell.exe -ArgumentList $args
 	})
 	
+$Menu1_SubMenu3.add_Click({
+	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\Evergreen\Configure Evergreen.ps1`""
+	start-process powershell.exe -ArgumentList $args
+	})
+
 $Menu_2.add_Click({ 
     start-process "C:\Program Files\Citrix\Provisioning Services Console\Console.msc"
 	})
@@ -141,28 +166,38 @@ $Menu4_SubMenu2.add_Click({
 	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Maintenance\Windows Updates Task.ps1`""
 	start-process powershell.exe -ArgumentList $args
 	})
-
-$Menu_5.add_Click({
-	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Documentation\PVS vDisk versions.ps1`""
+	
+$Menu5_SubMenu1.add_Click({
+	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Maintenance\Start Evergreen.ps1`""
+	start-process powershell.exe -ArgumentList $args
+	})
+	
+$Menu5_SubMenu2.add_Click({
+	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Maintenance\Evergreen Task.ps1`""
 	start-process powershell.exe -ArgumentList $args
 	})
 
 $Menu_6.add_Click({
-	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Merge\Merge PVS vDisk.ps1`""
+	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Documentation\PVS vDisk versions.ps1`""
 	start-process powershell.exe -ArgumentList $args
 	})
 
 $Menu_7.add_Click({
-	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Replication\Replicate PVS vDisk.ps1`""
+	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Merge\Merge PVS vDisk.ps1`""
 	start-process powershell.exe -ArgumentList $args
 	})
 
 $Menu_8.add_Click({
-	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Export\Export PVS vDisk.ps1`""
+	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Replication\Replicate PVS vDisk.ps1`""
 	start-process powershell.exe -ArgumentList $args
 	})
 
 $Menu_9.add_Click({
+	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Export\Export PVS vDisk.ps1`""
+	start-process powershell.exe -ArgumentList $args
+	})
+
+$Menu_10.add_Click({
 	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Shrink\Shrink PVS vDisk.ps1`""
 	start-process powershell.exe -ArgumentList $args
 	})

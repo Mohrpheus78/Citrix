@@ -1,20 +1,21 @@
 <#
 .SYNOPSIS
-This script will import a scheduled task from a template to start Windows Updates on a PVS maintenance device.
+This script will import a scheduled task from a template to launch Evergreen on a PVS maintenance device.
 	
 .DESCRIPTION
 The script will first ask you about admin credentials to import the task and create a new task based on a template xml file. 
 	
 .EXAMPLE
-."Windows Updates Task.ps1"
+."Evergreen Task.ps1"
     
 .NOTES
+Run as administrator! If you want to change the root folder you have to modify the shortcut.
 
 Author:         Dennis Mohrmann <@mohrpheus78>
-Creation Date:  2021-11-18
+Creation Date:  2022-02-18
 #>
 
-Write-Host -Foregroundcolor Yellow "Create a scheduled task to automatically install Windows Updates on your PVS vDisk"`n
+Write-Host -Foregroundcolor Yellow "Create a scheduled task to automatically launch the Evergreen script on your PVS vDisk"`n
 
 # Get Admin credentials
 $AdminUsername =  Read-Host "Enter domain name and a domain admin user name to run the task (Domain\Admin or Admin@domain.com)"
@@ -62,18 +63,18 @@ if ($vDisk.ID -notin $ValidChoices) {
 $vDiskName = $vDisk.Name
 $StoreName = $vDisk.StoreName
 	
-(Get-Content "$PSScriptRoot\Windows Updates vDisk-Template.xml" ) | Foreach-Object {
+(Get-Content "$PSScriptRoot\Evergreen-Template.xml" ) | Foreach-Object {
     $_ -replace "vDisk-Template", "$vDiskName" `
        -replace "Store-Template", "$StoreName" 
-    } | Set-Content "$PSScriptRoot\Windows Updates vDisk $vDiskName.xml"
+    } | Set-Content "$PSScriptRoot\Evergreen vDisk $vDiskName.xml"
 Try {
-	Register-ScheduledTask -User "$AdminUsername" -Password "$Password" -Xml (Get-Content "$PSScriptRoot\Windows Updates vDisk $vDiskName.xml" | out-string) -TaskName "Windows Updates vDisk $vDiskName" -Force
-	$Taskstate = (Get-ScheduledTask -TaskName "Windows Updates vDisk $vDiskName" | Select-Object State).State
+	Register-ScheduledTask -User "$AdminUsername" -Password "$Password" -Xml (Get-Content "$PSScriptRoot\Evergreen vDisk $vDiskName.xml" | out-string) -TaskName "Evergreen vDisk $vDiskName" -Force
+	$Taskstate = (Get-ScheduledTask -TaskName "Evergreen vDisk $vDiskName" | Select-Object State).State
 }
 catch {
 	Write-Warning "Task state $Taskstate"
 	write-warning "Error: $_."
 }
 Write-Host `n
-Write-Host -ForegroundColor Yellow "Add a trigger to the task 'Windows Updates vDisk $vDiskName', the vDisk will be promoted to 'Test' after installing the updates!"`n
+Write-Host -ForegroundColor Yellow "Add a trigger to the task 'Evergreen vDisk $vDiskName', the vDisk will be promoted to 'Test' after installing the software!"`n
 Read-Host "Press ENTER to exit"
