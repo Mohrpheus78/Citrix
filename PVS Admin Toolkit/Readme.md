@@ -6,7 +6,7 @@ Put all files and folders to "C:\Program Files (x86)\PVS Admin Toolkit" on your 
 2. Launch "PVS configuration" from the PVS Toolkit Configuration menu to configure your PVS environment
 3. Install the Powershell modules for your choosen hypervisor on your PVS server (Citrix XenServer SDK, VMWare Power.CLI or Nutanix.CLI )
 4. If you want to install Windows Updates inside your vDisk, first install the "PSWindowsUpdate" Powershell module on your PVS master
-5. If you want to use the Evergreen script from Manuel Winkel (deyda) you have to configure a file share which contains the script and the software and an install list for your maintenance device. Save the list in the following format: "NAME_OF_MASTER-Install.txt". For more information how to use Evergreen check Manuel's website: https://www.deyda.net/index.php/de/evergreen-script-de/
+5. If you want to use the Evergreen script from Manuel Winkel (deyda) you have to configure a file share which contains the script, the software and an install list for your maintenance device. Download you software first with a seperate server, after that select the software you want to install and save the list in the following format: "NAME_OF_MASTER-Install.txt" (rename the LastSettings.txt file). For more information how to use Evergreen check Manuel's website: https://www.deyda.net/index.php/de/evergreen-script-de/
 
 All values will be stored in XML files to be used as variables. Credentials will be encrypted and can only be used by the same user again. 
 
