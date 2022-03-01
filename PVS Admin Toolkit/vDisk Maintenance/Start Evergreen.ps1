@@ -34,6 +34,7 @@ param
 $Date = Get-Date -UFormat "%d.%m.%Y"
 $RootFolder = Split-Path -Path $PSScriptRoot
 $Log = "$RootFolder\Logs\Start Evergreen.log"
+$Evergreen = "True"
 
 # Start logging
 Start-Transcript $Log | Out-Null

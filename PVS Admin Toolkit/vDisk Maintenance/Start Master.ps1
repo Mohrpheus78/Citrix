@@ -183,14 +183,15 @@ IF ($Hypervisor -eq "AHV") {
 $connectiontimeout = 0
 Do {
 	Write-Host `n
-    Write-Host "waiting for '$MaintDeviceName' to boot..." `n
+    Write-Host "Waiting for '$MaintDeviceName' to boot..." `n
     sleep 5
     $connectiontimeout++
-   } until (Test-NetConnection "$MaintDeviceName.$ENV:USERDNSDOMAIN" -Port 2598 | ? {$_.TcpTestSucceeded -or $connectiontimeout -ge 10})
+   } until (Test-NetConnection "$MaintDeviceName.$ENV:USERDNSDOMAIN" -Port 5985 | ? {$_.TcpTestSucceeded -or $connectiontimeout -ge 10})
 IF ($connectiontimeout -eq 15) {
     Write-Host -ForegroundColor Red "Something is wrong, server not reachable, check the status of $MaintDeviceName"
     }
 else {
+      Start-Sleep -seconds 15
       Write-Host -ForegroundColor Green "Server '$MaintDeviceName' finished booting" `n
       }
 
@@ -206,11 +207,11 @@ Copy-Item -Path $Log -Destination "$RootFolder\Logs\Start-Master-VM-$MaintDevice
 Remove-Item $Log -force
 
 # Install Windows Updates
-IF ($WindowsUpdates -eq "Yes") {
+IF ($WindowsUpdates -eq "True") {
 	."$PSScriptRoot\Windows Updates.ps1"
 	}
 
 # Launch Evergreen
-IF ($Evergreen -eq "Yes") {
+IF ($Evergreen -eq "True") {
 	."$PSScriptRoot\Evergreen.ps1"
 	}

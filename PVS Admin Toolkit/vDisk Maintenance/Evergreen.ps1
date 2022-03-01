@@ -52,7 +52,7 @@ Do {
 	sleep -seconds 3
 	Write-Host "Evergreen is running..."`n
 	Do {
-		$EvergreenLog = (Get-ChildItem -Path "$EvergreenShare\_Install Logs" | Select-Object -Last 1).Name
+		$EvergreenLog = (Get-ChildItem -Path "$EvergreenShare\_Install Logs" | Sort-Object LastWriteTime -Descending | Select-Object -First 1).Name
 		#$EvergreenStatus = Get-Content "$EvergreenShare\_Install Logs\$EvergreenLog"
 		Get-Content "$EvergreenShare\_Install Logs\$EvergreenLog" | Select-Object -Last 1 -ErrorAction SilentlyContinue
 		Sleep -Seconds 5

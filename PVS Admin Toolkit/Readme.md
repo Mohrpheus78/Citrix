@@ -8,8 +8,9 @@ Put all files and folders to "C:\Program Files (x86)\PVS Admin Toolkit" on your 
 - https://www.citrix.com/downloads/citrix-hypervisor/product-software/hypervisor-82-standard-edition-CU1.html
 - https://developer.vmware.com/web/tool/vmware-powercli
 - https://portal.nutanix.com/page/documents/details?targetId=PS-Cmdlets-AOS-v6_0:ps-ps-cmdlets-installv2-r.html
-4. If you want to install Windows Updates inside your vDisk, install the "PSWindowsUpdate" Powershell module first on your PVS master (Install-Module -Name PSWindowsUpdate)
-5. If you want to use the Evergreen script from Manuel Winkel (deyda) you have to configure a file share which contains the script, the software and an install list for your maintenance device. Download you software first with a seperate server, after that select the software you want to install and save the list in the following format: "NAME_OF_MASTER-Install.txt" (rename the LastSettings.txt file). For more information how to use Evergreen check Manuel's website: https://www.deyda.net/index.php/de/evergreen-script-de/
+4. Enable WMI on your PVS target device (master) and open the appropriate firewall ports (5985)
+5. If you want to install Windows Updates inside your vDisk, install the "PSWindowsUpdate" Powershell module first on your PVS master (Install-Module -Name PSWindowsUpdate)
+6. If you want to use the Evergreen script from Manuel Winkel (deyda) you have to configure a file share which contains the script, the software and an install list for your maintenance device. Download you software first with a seperate server, after that select the software you want to install and save the list in the following format: "NAME_OF_MASTER-Install.txt" (rename the LastSettings.txt file). For more information how to use Evergreen check Manuel's website: https://www.deyda.net/index.php/de/evergreen-script-de/
 
 All values will be stored in XML files to be used as variables. Credentials will be encrypted and can only be used by the same user again. 
 
