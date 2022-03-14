@@ -100,7 +100,7 @@ IF ($BISF -eq "YES") {
 	}
 	ELSE {
 		Do {
-			$BISFLog = ((Get-ChildItem -Path "\\$MaintDeviceName\$CacheDrive\BISFLogs") | Sort-Object LastWriteTime -Descending | Select-Object -First 1).Name
+			$BISFLog = ((Get-ChildItem -Path "$BISFLogLocation\$MaintDeviceName") | Sort-Object LastWriteTime -Descending | Select-Object -First 1).Name
 			$BISFStatus = Get-Content "$BISFLogLocation\$MaintDeviceName\$BISFLog"
 			Get-Content "$BISFLogLocation\$MaintDeviceName\$BISFLog" | Select-Object -Last 1
 			Sleep -Seconds 1
