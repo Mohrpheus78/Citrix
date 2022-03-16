@@ -43,7 +43,7 @@ $choice=$host.ui.PromptForChoice($title, $message, $options, 0)
 		}
 Write-Host `n
 
-# VM name of PVS maintenance device
+# BIS-F configuration
 $title = ""
 $message = "Do you use Base Image Script Framework inside your PVD vDisk? (You really should! https://eucweb.com)"
 $yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes"

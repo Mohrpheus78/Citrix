@@ -66,7 +66,7 @@ $Date = Get-Date -UFormat "%d.%m.%Y"
 $Log = "$RootFolder\Logs\Start-Master-VM.log"
 $HypervisorConfig = Import-Clixml "$RootFolder\Hypervisor\Hypervisor.xml"
 $Hypervisor = $HypervisorConfig.Hypervisor
-$PVSConfig = "$RootFolder\PVS maintenance device\MaintenanceDevice.xml"
+$PVSConfig = Import-Clixml "$RootFolder\PVS\PVS.xml"
 
 # Start logging
 Start-Transcript $Log | Out-Null
