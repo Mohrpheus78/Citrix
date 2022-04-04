@@ -7,7 +7,7 @@ The purpose of the script is, that you have a documentation of your vDisk versio
 the old versions. 
 
 .PARAMETER -outputpath
-The path where the report is saved, default is "C:\Program Files (x86)\Scripts\vDisk Documentation".
+The path where the report is saved, default is "C:\Program Files (x86)\PVS Admin Toolkit\vDisk Documentation".
 
 .EXAMPLE
 & '.\PVS vDisk versions.ps1' -outputpath C:\Users\admin\Desktop or use shortcut
@@ -27,7 +27,7 @@ param (
 		[Parameter(Mandatory = $false)]
 		[ValidateNotNull()]
 		[ValidateNotNullOrEmpty()]
-		[Array]$outputpath = "C:\Program Files (x86)\Scripts\vDisk Documentation"
+		[Array]$outputpath = "C:\Program Files (x86)\PVS Admin Toolkit\vDisk Documentation"
 	  )
 
 
