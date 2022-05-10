@@ -56,6 +56,8 @@ Use-RunAs
 $RootFolder = Split-Path -Path $PSScriptRoot
 $Date = Get-Date -UFormat "%d.%m.%Y"
 $Log = "$RootFolder\Logs\New PVS vDisk version.log"
+write-host $StartMaster
+pause
 
 # Start logging
 Start-Transcript $Log | Out-Null
@@ -131,11 +133,14 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Copy-Item -Path $Log -Destination "$RootFolder\Logs\New PVS vDisk version-$vDiskName-Version $MaintVersion-$Date.log" -Force
+Copy-Item -Path $Log -Destination "$RootFolder\Logs\New PVS vDisk version-vDisk $vDiskName-Version $MaintVersion-$Date.log" -Force
 Remove-Item $Log -Force
 
 # Start Master VM? Default Yes if doing Windows Updates
-IF (-not(Test-Path variable:Task) -or $Task -eq $false) {
+IF ((Test-Path variable:Task) -or ($WindowsUpdates -eq $True) -or ($Task -eq $true)) {
+."$PSScriptRoot\Start Master.ps1"
+}
+Else {
 	$title = ""
 	$message = "Do you want to start the master VM?"
 	$yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes"
@@ -155,10 +160,6 @@ IF (-not(Test-Path variable:Task) -or $Task -eq $false) {
 	if ($answer -eq 'Yes') {
 		."$PSScriptRoot\Start Master.ps1"
 	}
-}
-Else {
-	Write-Host "direkt starten"
-	."$PSScriptRoot\Start Master.ps1"
 }
 
 IF (-not(Test-Path variable:Task) -or $Task -eq $false) {

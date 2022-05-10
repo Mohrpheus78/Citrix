@@ -32,11 +32,11 @@ param
 # Variables
 $Date = Get-Date -UFormat "%d.%m.%Y"
 $RootFolder = Split-Path -Path $PSScriptRoot
-$Log = "$RootFolder\Logs\Start Windows Updates.log"
+$WindowsUpdatesLog = "$RootFolder\Logs\Start Windows Updates.log"
 $WindowsUpdates = "True"
 
 # Start logging
-Start-Transcript $Log | Out-Null
+Start-Transcript $WindowsUpdatesLog | Out-Null
 
 # RunAs Admin
 function Use-RunAs 
@@ -74,11 +74,11 @@ Use-RunAs
 
 # Launch script
 Write-Host -ForegroundColor Yellow "Installing Windows Updates into a maintenance version" `n
-."$PSScriptRoot\New PVS vDisk version.ps1"
+."$PSScriptRoot\New PVS vDisk version.ps1" -StartMaster 
 
 # Stop Logging
 Stop-Transcript | Out-Null
-$Content = Get-Content -Path $Log | Select-Object -Skip 18
-Set-Content -Value $Content -Path $Log
-Copy-Item -Path $Log -Destination "$RootFolder\Windows Updates-$MaintDeviceName-$Date.log" -force
-Remove-Item $Log -Force
+$Content = Get-Content -Path $WindowsUpdatesLog | Select-Object -Skip 18
+Set-Content -Value $Content -Path $WindowsUpdatesLog
+Copy-Item -Path $WindowsUpdatesLog -Destination "$RootFolder\Windows Updates-$MaintDeviceName-$Date.log" -force
+Remove-Item $WindowsUpdatesLog -Force
