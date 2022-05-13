@@ -187,7 +187,6 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Copy-Item -Path $Log -Destination "$RootFolder\Logs\Promote PVS vDisk version-$vDiskName-$Date.log" -force
-Remove-Item $Log -force
+Rename-Item -Path $Log -NewName "Promote PVS vDisk version-$vDiskName-$Date.log"
 
 Read-Host "Press any key to exit"

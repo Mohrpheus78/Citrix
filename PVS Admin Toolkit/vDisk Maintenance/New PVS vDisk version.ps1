@@ -57,7 +57,6 @@ $RootFolder = Split-Path -Path $PSScriptRoot
 $Date = Get-Date -UFormat "%d.%m.%Y"
 $Log = "$RootFolder\Logs\New PVS vDisk version.log"
 write-host $StartMaster
-pause
 
 # Start logging
 Start-Transcript $Log | Out-Null
@@ -133,8 +132,7 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Copy-Item -Path $Log -Destination "$RootFolder\Logs\New PVS vDisk version-vDisk $vDiskName-Version $MaintVersion-$Date.log" -Force
-Remove-Item $Log -Force
+Rename-Item -Path $Log -NewName "New PVS vDisk version-vDisk $vDiskName-Version $MaintVersion-$Date.log"
 
 # Start Master VM? Default Yes if doing Windows Updates
 IF ((Test-Path variable:Task) -or ($WindowsUpdates -eq $True) -or ($Task -eq $true)) {

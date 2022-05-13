@@ -276,6 +276,5 @@ Get-PvsDiskVersion -Name $vDiskName -SiteName $SiteName -StoreName $StoreName | 
 Write-Host -ForegroundColor Green `n"Ready! vDisk $vDiskName replicated" `n
 
 DS_WriteLog "I" "Ready, start device in test mode to check vDisk!"
-Rename-Item $WULog -NewName "$RootFolder\Windows Update-$MaintDeviceName-$Date.log"
+Rename-Item -Path $WULog -NewName "Windows Update-$MaintDeviceName-$Date.log"
 Write-Host -ForegroundColor Green "Ready, start device in test mode to check vDisk!"
-

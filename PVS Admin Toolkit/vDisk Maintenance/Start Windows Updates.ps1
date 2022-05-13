@@ -32,7 +32,7 @@ param
 # Variables
 $Date = Get-Date -UFormat "%d.%m.%Y"
 $RootFolder = Split-Path -Path $PSScriptRoot
-$WindowsUpdatesLog = "$RootFolder\Logs\Start Windows Updates.log"
+$WindowsUpdatesLog = "$RootFolder\Logs\Start Windows Update.log"
 $WindowsUpdates = "True"
 
 # Start logging
@@ -80,5 +80,4 @@ Write-Host -ForegroundColor Yellow "Installing Windows Updates into a maintenanc
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $WindowsUpdatesLog | Select-Object -Skip 18
 Set-Content -Value $Content -Path $WindowsUpdatesLog
-Copy-Item -Path $WindowsUpdatesLog -Destination "$RootFolder\Windows Updates-$MaintDeviceName-$Date.log" -force
-Remove-Item $WindowsUpdatesLog -Force
+Rename-Item -Path $WindowsUpdatesLog -NewName "Start Windows Update-$MaintDeviceName-$Date.log"

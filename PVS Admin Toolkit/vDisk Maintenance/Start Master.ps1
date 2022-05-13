@@ -66,7 +66,7 @@ $Date = Get-Date -UFormat "%d.%m.%Y"
 $Log = "$RootFolder\Logs\Start-Master-VM.log"
 $HypervisorConfig = Import-Clixml "$RootFolder\Hypervisor\Hypervisor.xml"
 $Hypervisor = $HypervisorConfig.Hypervisor
-$PVSConfig = Import-Clixml "$RootFolder\PVS\PVS.xml"
+$PVSConfig = "$RootFolder\PVS maintenance device\MaintenanceDevice.xml"
 
 # Start logging
 Start-Transcript $Log | Out-Null
@@ -203,8 +203,7 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript #| Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Copy-Item -Path $Log -Destination "$RootFolder\Logs\Start-Master-VM-$MaintDeviceName-$Date.log" -Force
-Remove-Item $Log -force
+Rename-Item -Path $Log -NewName "Start-Master-VM-$MaintDeviceName-$Date.log"
 
 # Install Windows Updates
 IF ($WindowsUpdates -eq "True") {

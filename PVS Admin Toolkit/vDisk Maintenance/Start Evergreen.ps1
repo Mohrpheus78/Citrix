@@ -81,5 +81,4 @@ Write-Host -ForegroundColor Yellow "Executing Evergreen script inside a maintena
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Copy-Item -Path $Log -Destination "$RootFolder\Logs\Start-Evergreen-$Date.log" -force
-Remove-Item $Log -force
+Rename-Item -Path $Log -NewName "Start-Evergreen-$Date.log"

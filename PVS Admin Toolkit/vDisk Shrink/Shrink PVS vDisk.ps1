@@ -311,7 +311,6 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Copy-Item -Path $Log -Destination "$RootFolder\Shrink PVS vDisk-$vDiskName-$Date.log" -Force
-Remove-Item $Log -force
+Rename-Item -Path $Log -NewName "$Shrink PVS vDisk-$vDiskName-$Date.log"
 
 Read-Host `n "Press any key to exit"
