@@ -66,7 +66,7 @@ $Date = Get-Date -UFormat "%d.%m.%Y"
 $Log = "$RootFolder\Logs\Start-Master-VM.log"
 $HypervisorConfig = Import-Clixml "$RootFolder\Hypervisor\Hypervisor.xml"
 $Hypervisor = $HypervisorConfig.Hypervisor
-$PVSConfig = "$RootFolder\PVS maintenance device\MaintenanceDevice.xml"
+$PVSConfig = Import-Clixml "$RootFolder\PVS\PVS.xml"
 
 # Start logging
 Start-Transcript $Log | Out-Null
@@ -76,6 +76,7 @@ $SiteName = (Get-PvsSite).SiteName
 
 # Get PVS device in maintenance mode for the selected vDisk
 $MaintDeviceName = (Get-PvsDeviceInfo -SiteName $SiteName | where-Object {$_.Type -eq 2 -and $_.DiskLocatorName -eq "$StoreName\$vDiskName"}).Name
+$MaintDeviceNameWindows = (Get-PvsDeviceInfo -SiteName $SiteName | where-Object {$_.Type -eq 2 -and $_.DiskLocatorName -eq "$StoreName\$vDiskName"}).Name
 
 # Citrix XenServer
 IF ($Hypervisor -eq "Xen") {
@@ -91,7 +92,7 @@ $Credential = Import-CliXml -Path "$RootFolder\Hypervisor\Credentials-Xen.xml"
 Try {
 	Connect-XenServer -url https://$Xen -Creds $Credential -NoWarnNewCertificates -SetDefaultSession | Out-Null
 	IF (-not(Get-XenVM | Where-Object {$_.name_label -eq "$MaintDeviceName"})) {
-		$MaintDeviceName = "$PVSConfig.MaintDeviceName"
+		$MaintDeviceName = $PVSConfig.MaintDeviceName
 	}
 		IF (Get-XenVM | Where {$_.name_label -eq "$MaintDeviceName" -and $_.power_state -eq "Halted" -and $_.is_a_template -eq $False}) {
 			Do {
@@ -123,7 +124,7 @@ $Credential = Import-CliXml -Path "$RootFolder\Hypervisor\Credentials-ESX.xml"
 		Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -confirm:$false | Out-Null
 		Connect-VIServer -server $ESX -Credential $Credential
 		IF (-not(Get-VM | Where-Object {$_.Name -eq "$MaintDeviceName"})) {
-			$MaintDeviceName = "$PVSConfig.MaintDeviceName"
+			$MaintDeviceName = $PVSConfig.MaintDeviceName
 		}		
 		IF (Get-VM -Name "$MaintDeviceName" | Where-Object {$_.PowerState -eq "PoweredOff"}) {
 			Do {
@@ -183,17 +184,49 @@ IF ($Hypervisor -eq "AHV") {
 $connectiontimeout = 0
 Do {
 	Write-Host `n
-    Write-Host "Waiting for '$MaintDeviceName' to boot..." `n
+    Write-Host "Waiting for '$MaintDeviceNameWindows' to boot..." `n
     sleep 5
     $connectiontimeout++
-   } until (Test-NetConnection "$MaintDeviceName.$ENV:USERDNSDOMAIN" -Port 5985 | ? {$_.TcpTestSucceeded -or $connectiontimeout -ge 10})
+   } until (Test-NetConnection "$MaintDeviceNameWindows.$ENV:USERDNSDOMAIN" -Port 5985 | ? {$_.TcpTestSucceeded -or $connectiontimeout -ge 10})
 IF ($connectiontimeout -eq 15) {
-    Write-Host -ForegroundColor Red "Something is wrong, server not reachable, check the status of $MaintDeviceName"
+    Write-Host -ForegroundColor Red "Something is wrong, server not reachable, check the status of $MaintDeviceNameWindows, hit any key to exit"
+	# Stop Logging
+	$ScriptEnd = Get-Date
+	$ScriptRuntime =  $ScriptEnd - $ScriptStart | Select-Object TotalSeconds
+	$ScriptRuntimeInSeconds = $ScriptRuntime.TotalSeconds
+	Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSeconds seconds" `n
+	Stop-Transcript #| Out-Null
+	$Content = Get-Content -Path $Log | Select-Object -Skip 18
+	Set-Content -Value $Content -Path $Log
+	Rename-Item -Path $Log -NewName "Start-Master-VM-$MaintDeviceNameWindows-$Date.log"
+	Read-Host
+	BREAK
     }
 else {
       Start-Sleep -seconds 15
-      Write-Host -ForegroundColor Green "Server '$MaintDeviceName' finished booting" `n
+      Write-Host -ForegroundColor Green "Server '$MaintDeviceNameWindows' finished booting" `n
       }
+
+# Connect to master?
+$title = ""
+	$message = "Do you want to connect to the master VM via RDP?"
+	$yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes"
+	$no = New-Object System.Management.Automation.Host.ChoiceDescription "&No"
+	$options = [System.Management.Automation.Host.ChoiceDescription[]]($yes, $no)
+	$choice=$host.ui.PromptForChoice($title, $message, $options, 0)
+
+	switch ($choice) {
+		0 {
+		$answer = 'Yes'       
+		}
+		1 {
+		$answer = 'No'
+		}
+	}
+
+	if ($answer -eq 'Yes') {
+		start-process mstsc.exe -ArgumentList "/f /admin /v:$MaintDeviceNameWindows"
+	}
 
 # Stop Logging
 $ScriptEnd = Get-Date
@@ -203,7 +236,7 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript #| Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Rename-Item -Path $Log -NewName "Start-Master-VM-$MaintDeviceName-$Date.log"
+Rename-Item -Path $Log -NewName "Start-Master-VM-$MaintDeviceNameWindows-$Date.log"
 
 # Install Windows Updates
 IF ($WindowsUpdates -eq "True") {
