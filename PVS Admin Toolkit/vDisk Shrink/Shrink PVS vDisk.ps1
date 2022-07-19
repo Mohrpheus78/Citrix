@@ -209,7 +209,7 @@ $vDiskName = $vDisk.Name
 $StoreName = $vDisk.StoreName
 
 $LatestVersion = (Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName).Version | Select-Object -First 1
-$MergedBaseVersion = ((Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName) | Where-Object {$_.Type -eq '4' -and $_.Access -eq 0} | select-Object -First 1)
+$MergedBaseVersion = ((Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName) | Where-Object {$_.Type -eq '4' -or '0' -and $_.Access -eq 0} | select-Object -First 1)
 IF ($MergedBaseVersion.Version -ne $LatestVersion) {
     Write-Host -ForegroundColor Red "No actual merged base version found, you select an older merged base version, aborting!"
     Read-Host "Press any key to exit"

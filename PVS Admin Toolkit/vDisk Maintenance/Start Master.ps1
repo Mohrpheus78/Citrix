@@ -207,6 +207,7 @@ else {
       Write-Host -ForegroundColor Green "Server '$MaintDeviceNameWindows' finished booting" `n
       }
 
+IF ($WindowsUpdates -ne "True") {
 # Connect to master?
 $title = ""
 	$message = "Do you want to connect to the master VM via RDP?"
@@ -225,8 +226,19 @@ $title = ""
 	}
 
 	if ($answer -eq 'Yes') {
-		start-process mstsc.exe -ArgumentList "/f /admin /v:$MaintDeviceNameWindows"
+		$connectiontimeout = 0
+		Do {
+			Write-Host `n
+			Write-Host "Check if '$MaintDeviceNameWindows' is ready to connect..." `n
+			sleep 5
+			$connectiontimeout++
+		   } until (Test-NetConnection "$MaintDeviceNameWindows.$ENV:USERDNSDOMAIN" -Port 3389 | ? {$_.TcpTestSucceeded -or $connectiontimeout -ge 5})
+		   start-process mstsc.exe -ArgumentList "/f /admin /v:$MaintDeviceNameWindows"
+		IF ($connectiontimeout -eq 10) {
+			Write-Host -ForegroundColor Red "Something is wrong, server not reachable, check the status of $MaintDeviceNameWindows"
+			}
 	}
+}
 
 # Stop Logging
 $ScriptEnd = Get-Date
@@ -236,7 +248,7 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript #| Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Rename-Item -Path $Log -NewName "Start-Master-VM-$MaintDeviceNameWindows-$Date.log"
+Rename-Item -Path $Log -NewName "Start-Master-VM-$MaintDeviceNameWindows-$Date.log" -EA SilentlyContinue
 
 # Install Windows Updates
 IF ($WindowsUpdates -eq "True") {

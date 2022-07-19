@@ -132,7 +132,7 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Rename-Item -Path $Log -NewName "New PVS vDisk version-vDisk $vDiskName-Version $MaintVersion-$Date.log"
+Rename-Item -Path $Log -NewName "New PVS vDisk version-vDisk $vDiskName-Version $MaintVersion-$Date.log" -EA SilentlyContinue
 
 # Start Master VM? Default Yes if doing Windows Updates
 IF ((Test-Path variable:Task) -or ($WindowsUpdates -eq $True) -or ($Task -eq $true)) {
