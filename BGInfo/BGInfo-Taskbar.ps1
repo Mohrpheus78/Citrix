@@ -14,6 +14,7 @@
 # 09/11/20  DM 	Added Regkeys for IP and DNS (Standard method didn't work wirh Citrix Hypervisor)
 # 18/12/20	DM	Added GPU Infos and Citrix Rendezvous protocol
 # 08/03/21	DM	Fixed FriendlyName to FileSystemLabel
+# 01/11/22	DM	Changed Rendevouz value, now displays 'none', '1.0' or '2.0'
 # *******************************************************************************************************
 
 <#
@@ -86,14 +87,6 @@ New-ItemProperty -Path $RegistryPath -Name "Citrix Client IP" -Value $CitrixClie
 # HDX Protocol
 $HDXProtocol = Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_Network_Enum | Where-Object {$_.SessionID -eq $CitrixSessionID} | Select-Object -ExpandProperty Component_Protocol
 New-ItemProperty -Path $RegistryPath -Name "HDX Protocol" -Value $HDXProtocol -Force
-IF ($HDXProtocol -eq "UDP-DTLS-CGP-ICA")
-	{
-	 New-ItemProperty -Path $RegistryPath -Name "Rendezvous" -Value Yes -Force
-	}
-ELSE 
-	{
-	 New-ItemProperty -Path $RegistryPath -Name "Rendezvous" -Value No -Force
-	}
 
 # HDX Video Codec
 $HDXCodec = Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_VirtualChannel_Thinwire_Enum | Where-Object {$_.SessionID -eq $CitrixSessionID} | Select-Object -ExpandProperty Component_VideoCodecUse
@@ -126,6 +119,10 @@ New-ItemProperty -Path $RegistryPath -Name "HDX Web Camera" -Value $HDXWebCamera
 # MTU
 $MTUSize = (ctxsession -v | findstr "EDT MTU:" | Select-Object -Last 1).split(":")[1].trimstart()
 New-ItemProperty -Path $RegistryPath -Name "MTU Size" -Value $MTUSize -Force
+
+# Rendezvous
+$Rendezvous = ((ctxsession -v | findstr "Rendezvous") | Select-Object -Last 1).split(":")[1].trimstart()
+New-ItemProperty -Path $RegistryPath -Name "Rendezvous" -Value $Rendezvous -Force
 
 # WEM Version
 $WEM = (Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object {$_.DisplayName -like "*Citrix Workspace Environment*"}).DisplayVersion | Select-Object -First 1
