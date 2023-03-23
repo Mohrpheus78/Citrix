@@ -6,14 +6,12 @@
 # 09/12/19	DM	Added deviceTRUST
 # 11/12/19	DM	Initial public release
 # 11/12/19	DM	Changed method to get session id
-# 18/06/20	DM 	Added MTU Size, WEM and VDA Agent version
+# 18/06/20	DM  Added MTU Size, WEM and VDA Agent version
 # 26/06/20	DM	Added FSLogix Version
 # 26/06/20	DM	Changed BGInfo process handling
 # 20/10/20	DM	Added percent for FSL
 # 21/10/20	DM	Added WEM Cache date
 # 09/11/20  DM 	Added Regkeys for IP and DNS (Standard method didn't work wirh Citrix Hypervisor)
-# 18/12/20	DM	Added GPU Infos and Citrix Rendezvous protocol
-# 01/11/22	DM	Changed Rendevouz value, now displays 'none', '1.0' or '2.0' 
 # *******************************************************************************************************
 
 <#
@@ -27,7 +25,8 @@ Execute as logon script or WEM external task to show useful informations about t
 WEM:
 Path: powershell.exe
 Arguments: -executionpolicy bypass -file "C:\Program Files (x86)\SuL\Citrix Management Tools\BGInfo\BGInfo.ps1"
-    
+.FSLogix Profile Size Warning.ps1
+	    
 .NOTES
 Execute as WEM external task (also after reconnect to refresh the information), logonscript or task at logon
 Edit the $BGInfoDir (Directory with BGInfo.exe) and $BGInfoFile (BGI file to load)
@@ -38,7 +37,7 @@ Edit the $BGInfoDir (Directory with BGInfo.exe) and $BGInfoFile (BGI file to loa
 # *******************
 
 # Source directory for BGInfo/BGInfo File (customize)
-$BGInfoDir = 'C:\Program Files (x86)\BGInfo'
+$BGInfoDir = 'C:\Program Files (x86)\SuL\Citrix Management Tools\BGInfo'
 $BGInfoFile = 'Citrix.bgi'
 
 # Regkey for setting the values (BGinfo gets informations from this source, don't edit!)
@@ -70,14 +69,6 @@ New-ItemProperty -Path $RegistryPath -Name "Clientname" -Value $CitrixClientName
 # Citrix Client
 $CitrixClientVer = Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_Client_Enum | Where-Object {$_.SessionID -eq $CitrixSessionID} | Select-Object -ExpandProperty Version
 New-ItemProperty -Path $RegistryPath -Name "Citrix Client Ver" -Value $CitrixClientVer -Force
-
-# Citrix Client Platform
-$ClientProductId=(Get-ItemProperty HKLM:\Software\Citrix\ICA\Session\$CitrixSessionID\Connection -name ClientProductId).ClientproductId
-if ($ClientProductId -eq 1) {$Platform="Windows"}
-if ($ClientProductId -eq 81) {$Platform="Linux"}
-if ($ClientProductId -eq 82) {$Platform="Mac"}
-if ($ClientProductId -eq 257) {$Platform="HTML5"}
-New-ItemProperty -Path $RegistryPath -Name "Citrix Client Platform" -Value $Platform -Force
 
 # Citrix Client IP
 $CitrixClientIP = Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_Client_Enum | Where-Object {$_.SessionID -eq $CitrixSessionID} | Select-Object -ExpandProperty Address
@@ -119,13 +110,13 @@ New-ItemProperty -Path $RegistryPath -Name "HDX Web Camera" -Value $HDXWebCamera
 $MTUSize = (ctxsession -v | findstr "EDT MTU:" | Select-Object -Last 1).split(":")[1].trimstart()
 New-ItemProperty -Path $RegistryPath -Name "MTU Size" -Value $MTUSize -Force
 
+# WEM Version
+$WEM = (Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object {$_.DisplayName -like "*Citrix Workspace Environment*"}).DisplayVersion | Select-Object -Last 1
+New-ItemProperty -Path $RegistryPath -Name "WEM Version" -Value $WEM -Force
+
 # Rendezvous
 $Rendezvous = ((ctxsession -v | findstr "Rendezvous") | Select-Object -Last 1).split(":")[1].trimstart()
 New-ItemProperty -Path $RegistryPath -Name "Rendezvous" -Value $Rendezvous -Force
-
-# WEM Version
-$WEM = (Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object {$_.DisplayName -like "*Citrix Workspace Environment*"}).DisplayVersion | Select-Object -First 1
-New-ItemProperty -Path $RegistryPath -Name "WEM Version" -Value $WEM -Force
 
 # WEM Agent logon
 $WEMAgentLastRun = Get-EventLog -LogName 'WEM Agent Service' -Message '*Starting Logon Processing for User*' -Newest 1 |Select-Object -ExpandProperty TimeGenerated
@@ -188,37 +179,6 @@ $FSLVersion = (Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\Cur
 New-ItemProperty -Path $RegistryPath -Name "FSL Version" -Value $FSLVersion -Force
 
 
-# ************************
-# Informations about GPU #
-# ************************
-
-# GPU
-$GPU = (Get-WmiObject win32_videocontroller).Name
-New-ItemProperty -Path $RegistryPath -Name "GPU" -Value $GPU -Force
-
-# Hardware Encoder
-$HardwareEncoder = (Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_VirtualChannel_Thinwire_Base | Where-Object {$_.SessionID -eq $CitrixSessionID}).Component_Monitor_HardwareEncodeInUse | Select-Object -First 1
-IF ($HardwareEncoder -eq "True")
-    {
-        New-ItemProperty -Path $RegistryPath -Name "HW Encoder" -Value Yes -Force
-	}
-ELSE 
-	{
-        New-ItemProperty -Path $RegistryPath -Name "HW Encoder" -Value No -Force
-	}
-	
-# HDX 3D
-$HDX3D = (Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_VirtualChannel_Thinwire_Base | Where-Object {$_.SessionID -eq $CitrixSessionID}).Component_HDX3DPro | Select-Object -First 1
-IF ($HDX3D -eq "True")
-    {
-        New-ItemProperty -Path $RegistryPath -Name "HDX3D" -Value Yes -Force
-	}
-ELSE 
-	{
-        New-ItemProperty -Path $RegistryPath -Name "HDX3D" -Value No -Force
-	}
-	
-
 # BGInfo #
-# Execute BGInfo as wallpaper
+# Start BGInfo
 Start-Process -FilePath "$BGInfoDir\Bginfo64.exe" -ArgumentList @('/nolicprompt','/timer:0',"`"$BGInfoDir\$BGInfoFile`"") 

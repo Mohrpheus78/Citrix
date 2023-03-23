@@ -1,45 +1,67 @@
 # *******************************************************************************************************
+
 # D. Mohrmann, S&L Firmengruppe, Twitter: @mohrpheus78
+
 # BGInfo powered by Powershell
+
 # 05/12/19	DM	Initial release
+
 # 06/12/19	DM	Added FSLogix
+
 # 09/12/19	DM	Added deviceTRUST
+
 # 11/12/19	DM	Initial public release
+
 # 11/12/19	DM	Changed method to get session id
+
 # 18/06/20	DM 	Added MTU Size, WEM and VDA Agent version
+
 # 26/06/20	DM	Added FSLogix Version
+
 # 26/06/20	DM	Changed BGInfo process handling
+
 # 20/10/20	DM	Added percent for FSL
+
 # 21/10/20	DM	Added WEM Cache date
+
 # 09/11/20  DM 	Added Regkeys for IP and DNS (Standard method didn't work wirh Citrix Hypervisor)
+
 # 18/12/20	DM	Added GPU Infos and Citrix Rendezvous protocol
+
 # 08/03/21	DM	Fixed FriendlyName to FileSystemLabel
-# 01/11/22	DM	Changed Rendevouz value, now displays 'none', '1.0' or '2.0'
+
 # *******************************************************************************************************
+
+
 
 <#
 .SYNOPSIS
 Shows information about the user Citrix environment as BGInfo taskbar icon
+
 		
 .Description
 Execute as logon script or WEM external task to show useful informations about the user environment
 		
+
 .EXAMPLE
 WEM external task:
 Path: powershell.exe
 Arguments: -executionpolicy bypass -file "C:\Program Files (x86)\SuL\Citrix Management Tools\BGInfo\BGInfo-Taskbar-Taskbar.ps1"
 	    
+
 .NOTES
 Execute as WEM external task (also after reconnect to refresh the information), logonscript or task at logon
 Edit the $BGInfoDir (Directory with BGInfo.exe) and $BGInfoFile (BGI file to load)
 #>
+
+
 
 # *******************
 # Scripts starts here
 # *******************
 
 # Source directory for BGInfo/BGInfo File (customize)
-$BGInfoDir = 'C:\Program Files (x86)\BGInfo'
+$BGInfoDir = 'C:\Program Files (x86)\SuL\Citrix Management Tools\BGInfo'
 $BGInfoFile = 'Citrix.bgi'
 
 # Regkey for setting the values (BGinfo gets informations from this source, don't edit!)
@@ -109,12 +131,14 @@ New-ItemProperty -Path $RegistryPath -Name "HDX Visual Lossless Compression" -Va
 $HDXColorspace = Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_VirtualChannel_Thinwire_Enum | Where-Object {$_.SessionID -eq $CitrixSessionID} | Select-Object -ExpandProperty Component_VideoCodecColorspace
 New-ItemProperty -Path $RegistryPath -Name "HDX Colorspace" -Value $HDXColorspace -Force
 
+<#
 # HDX Web Camera
 $HDXWebCamera = Get-ItemProperty -Path "HKCU:\SOFTWARE\Citrix\HdxRealTime\"
 $HDXWebCamera = Get-ItemProperty -Path "HKCU:\SOFTWARE\Citrix\HdxRealTime\"
 $HDXWebCamera = $HDXWebCamera.'Filter Name'
 $HDXWebCamera = $HDXWebCamera -replace '@.*$'
 New-ItemProperty -Path $RegistryPath -Name "HDX Web Camera" -Value $HDXWebCamera -Force
+#>
 
 # MTU
 $MTUSize = (ctxsession -v | findstr "EDT MTU:" | Select-Object -Last 1).split(":")[1].trimstart()
@@ -175,6 +199,7 @@ New-ItemProperty -Path $RegistryPath -Name "FSL O365 Status" -Value $FSLO365Stat
 $FSLO365Size = Get-Volume -FileSystemLabel *O365-$ENV:USERNAME* | Where-Object { $_.DriveType -eq 'Fixed'} | ForEach-Object {[string]::Format("{0:0.00} GB", $_.Size / 1GB)}
 New-ItemProperty -Path $RegistryPath -Name "FSL O365 Size" -Value $FSLO365Size -Force
 
+
 # FSLogix O365 Size Remaining
 $FSLO365SizeRemaining = Get-Volume -FileSystemLabel *O365-$ENV:USERNAME* | Where-Object { $_.DriveType -eq 'Fixed'} | ForEach-Object {[string]::Format("{0:0.00} GB", $_.SizeRemaining / 1GB)}
 New-ItemProperty -Path $RegistryPath -Name "FSL O365 Size Remaining" -Value $FSLO365SizeRemaining -Force
@@ -207,7 +232,7 @@ ELSE
 	{
         New-ItemProperty -Path $RegistryPath -Name "HW Encoder" -Value No -Force
 	}
-	
+
 # HDX 3D
 $HDX3D = (Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_VirtualChannel_Thinwire_Base | Where-Object {$_.SessionID -eq $CitrixSessionID}).Component_HDX3DPro | Select-Object -First 1
 IF ($HDX3D -eq "True")
@@ -219,10 +244,8 @@ ELSE
         New-ItemProperty -Path $RegistryPath -Name "HDX3D" -Value No -Force
 	}
 
-
 # Execute BGInfo as Tray icon, if already executed end process before
 $BGInfoID = (Get-Process | Where-Object {$_.ProcessName -eq "BGInfo64" -and $_.SI -eq "$CitrixSessionID"}).Id
 Stop-Process -Id $BGInfoID -EA SilentlyContinue
 Start-Sleep -Seconds 1
-Start-Process -FilePath "$BGInfoDir\Bginfo64.exe" -ArgumentList @('/taskbar','/nolicprompt','/timer:0',"`"$BGInfoDir\$BGInfoFile`"") 
-
+Start-Process -FilePath "$BGInfoDir\Bginfo64.exe" -ArgumentList @('/taskbar','/nolicprompt','/timer:0',"`"$BGInfoDir\$BGInfoFile`"")
