@@ -1,37 +1,20 @@
 # *******************************************************************************************************
-
 # D. Mohrmann, S&L Firmengruppe, Twitter: @mohrpheus78
-
 # BGInfo powered by Powershell
-
 # 05/12/19	DM	Initial release
-
 # 06/12/19	DM	Added FSLogix
-
 # 09/12/19	DM	Added deviceTRUST
-
 # 11/12/19	DM	Initial public release
-
 # 11/12/19	DM	Changed method to get session id
-
 # 18/06/20	DM 	Added MTU Size, WEM and VDA Agent version
-
 # 26/06/20	DM	Added FSLogix Version
-
 # 26/06/20	DM	Changed BGInfo process handling
-
 # 20/10/20	DM	Added percent for FSL
-
 # 21/10/20	DM	Added WEM Cache date
-
 # 09/11/20  DM 	Added Regkeys for IP and DNS (Standard method didn't work wirh Citrix Hypervisor)
-
 # 18/12/20	DM	Added GPU Infos and Citrix Rendezvous protocol
-
 # 08/03/21	DM	Fixed FriendlyName to FileSystemLabel
-
 # *******************************************************************************************************
-
 
 
 <#
@@ -53,7 +36,6 @@ Arguments: -executionpolicy bypass -file "C:\Program Files (x86)\SuL\Citrix Mana
 Execute as WEM external task (also after reconnect to refresh the information), logonscript or task at logon
 Edit the $BGInfoDir (Directory with BGInfo.exe) and $BGInfoFile (BGI file to load)
 #>
-
 
 
 # *******************
@@ -219,7 +201,7 @@ New-ItemProperty -Path $RegistryPath -Name "FSL Version" -Value $FSLVersion -For
 # ************************
 
 # GPU
-$GPU = (Get-WmiObject win32_videocontroller).Name
+$GPU = ((Get-WmiObject win32_videocontroller) | Where-Object {$_.Name -notlike "Citrix*"}).Name
 New-ItemProperty -Path $RegistryPath -Name "GPU" -Value $GPU -Force
 
 # Hardware Encoder
