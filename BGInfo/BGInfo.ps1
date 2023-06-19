@@ -14,6 +14,7 @@
 # 09/11/20  DM 	Added Regkeys for IP and DNS (Standard method didn't work wirh Citrix Hypervisor)
 # 18/12/20	DM	Added GPU Infos and Citrix Rendezvous protocol
 # 08/03/21	DM	Fixed FriendlyName to FileSystemLabel
+# 06/19/23	DM	Added Proxy for Rendezvous and user logon time
 # *******************************************************************************************************
 
 
@@ -66,6 +67,10 @@ New-ItemProperty -Path $RegistryPath -Name "DNSServer" -Value $DNSServer -Force
 # Citrix SessionID
 $CitrixSessionID = Get-ChildItem -Path "HKCU:\Volatile Environment" -Name
 New-ItemProperty -Path $RegistryPath -Name "SessionID" -Value $CitrixSessionID -Force
+
+# Logon time
+$UserLogonTime = (Get-EventLog -LogName 'Application' -Source 'Citrix Desktop Service' -Newest 1 | Where EventID -EQ 1027).TimeWritten
+New-ItemProperty -Path $RegistryPath -Name "LogonTime" -Value $UserLogonTime -Force
 
 # Citrix Clientname
 $CitrixClientName = Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_Client_Enum | Where-Object {$_.SessionID -eq $CitrixSessionID} | Select-Object -ExpandProperty Name
@@ -128,6 +133,16 @@ New-ItemProperty -Path $RegistryPath -Name "MTU Size" -Value $MTUSize -Force
 # Rendezvous
 $Rendezvous = ((ctxsession -v | findstr "Rendezvous") | Select-Object -Last 1).split(":")[1].trimstart()
 New-ItemProperty -Path $RegistryPath -Name "Rendezvous" -Value $Rendezvous -Force
+
+# Proxy
+$Proxytransport = ((ctxsession -v | findstr "Transport") | Select-Object -Last 1).split(":")[1].trimstart()
+if ($Proxytransport -like "*PROXY*") {
+	$Proxy = "YES"
+	}
+else {
+	$Proxy ="No"
+}
+New-ItemProperty -Path $RegistryPath -Name "Proxy" -Value $Proxy -Force
 
 # WEM Version
 $WEM = (Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object {$_.DisplayName -like "*Citrix Workspace Environment*"}).DisplayVersion | Select-Object -First 1

@@ -6,12 +6,13 @@
 # 09/12/19	DM	Added deviceTRUST
 # 11/12/19	DM	Initial public release
 # 11/12/19	DM	Changed method to get session id
-# 18/06/20	DM  	Added MTU Size, WEM and VDA Agent version
+# 18/06/20	DM  Added MTU Size, WEM and VDA Agent version
 # 26/06/20	DM	Added FSLogix Version
 # 26/06/20	DM	Changed BGInfo process handling
 # 20/10/20	DM	Added percent for FSL
 # 21/10/20	DM	Added WEM Cache date
-# 09/11/20  	DM  	Added Regkeys for IP and DNS (Standard method didn't work wirh Citrix Hypervisor)
+# 09/11/20  DM  Added Regkeys for IP and DNS (Standard method didn't work wirh Citrix Hypervisor)
+# 06/19/23	DM	Added Proxy for Rendezvous and user logon time
 # *******************************************************************************************************
 
 <#
@@ -62,6 +63,10 @@ New-ItemProperty -Path $RegistryPath -Name "DNSServer" -Value $DNSServer -Force
 $CitrixSessionID = Get-ChildItem -Path "HKCU:\Volatile Environment" -Name
 New-ItemProperty -Path $RegistryPath -Name "SessionID" -Value $CitrixSessionID -Force
 
+# Logon time
+$UserLogonTime = (Get-EventLog -LogName 'Application' -Source 'Citrix Desktop Service' -Newest 1 | Where EventID -EQ 1027).TimeWritten
+New-ItemProperty -Path $RegistryPath -Name "LogonTime" -Value $UserLogonTime -Force
+
 # Citrix Clientname
 $CitrixClientName = Get-WmiObject -Namespace root\citrix\hdx -Class Citrix_Client_Enum | Where-Object {$_.SessionID -eq $CitrixSessionID} | Select-Object -ExpandProperty Name
 New-ItemProperty -Path $RegistryPath -Name "Clientname" -Value $CitrixClientName -Force
@@ -85,6 +90,17 @@ New-ItemProperty -Path $RegistryPath -Name "MTU Size" -Value $MTUSize -Force
 # Rendezvous
 $Rendezvous = ((ctxsession -v | findstr "Rendezvous") | Select-Object -Last 1).split(":")[1].trimstart()
 New-ItemProperty -Path $RegistryPath -Name "Rendezvous" -Value $Rendezvous -Force
+
+# Proxy
+$Proxytransport = ((ctxsession -v | findstr "Transport") | Select-Object -Last 1).split(":")[1].trimstart()
+if ($Proxytransport -like "*PROXY*") {
+	$Proxy = "YES"
+	}
+else {
+	$Proxy ="No"
+}
+New-ItemProperty -Path $RegistryPath -Name "Proxy" -Value $Proxy -Force
+
 
 
 # BGInfo #
