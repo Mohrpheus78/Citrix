@@ -22,7 +22,7 @@ Write-Host `n
 Write-Host "You need a share where we can find the Evergreen script!"
 Write-Host `n
 $EvergreenShare = Read-Host "Enter a valid UNC path for the Evergreen Powershell script (\\server\share)"
-IF (!(Test-Path -Path "$EvergreenShare\Evergreen.ps1")) {
+IF (!(Test-Path -Path "$EvergreenShare\Evergreen-Software Installer.ps1")) {
 	Write-Host -ForegroundColor Red "Error, Evergreen.ps1 script not found! Check UNC path and run script again!"
 	Read-Host "Press ENTER to exit"
 	BREAK

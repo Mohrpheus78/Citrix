@@ -56,8 +56,24 @@ Function DS_WriteLog {
     }
 }
 
+# Check free size
+$FreeSize = Invoke-Command -ComputerName $MaintDeviceName -ScriptBlock {
+	(Get-Volume -DriveLetter C) | ForEach-Object {[math]::Round($_.SizeRemaining / 1GB, 1)}
+}
+IF ($FreeSize -lt 5) {
+		Write-Host `n
+		Write-Host -ForegroundColor Red "Attention, not enough free space on drive C: to perform the updates, please free up space, free space is $FreeSize GB!"`n
+		Write-Host "$MaintDeviceName ist still running, please shut down the server! Press Enter to exit"
+		Read-Host
+		DS_WriteLog "E" "Attention, not enough free space on drive C: to perform the updates, please free up space, free space is $FreeSize GB!"
+		Rename-Item -Path $WULog -NewName "Windows Update-$MaintDeviceName-$Date.log"
+		BREAK
+	}
+	
+ELSE {
+Write-Host -ForegroundColor Green "Enough free space ($FreeSize GB) on drive C: to perform the updates, please wait..."`n
+
 #Check PSWindowsUpdate module
-Write-Host `n
 DS_WriteLog "I" "Checking PSWindowsUpdate Module..."
 $PSWindowsUpdate = invoke-command -ComputerName $MaintDeviceName -ScriptBlock {Get-Module -ListAvailable -Name PSWindowsUpdate}
 IF ($PSWindowsUpdate -eq $null) {
@@ -80,6 +96,16 @@ IF ($PSWindowsUpdate -eq $null) {
 	invoke-command -ComputerName $MaintDeviceName -ScriptBlock {shutdown -s -t 5 -f}
 	BREAK
 	}
+
+# Update PSWindowsUpdate module
+DS_WriteLog "I" "Trying to update PSWindowsUpdate Module..."
+Write-Host `n
+$LocalPSWindowsUpdate = invoke-command -ComputerName $MaintDeviceName -ScriptBlock {(Get-Module -Name PSWindowsUpdate -ListAvailable | Select-Object -First 1).Version}
+$CurrentPSWindowsUpdate = invoke-command -ComputerName $MaintDeviceName -ScriptBlock {(Find-Module -Name PSWindowsUpdate -Repository PSGallery).Version}
+IF (($LocalPSWindowsUpdate -lt $CurrentPSWindowsUpdate))
+{
+    invoke-command -ComputerName $MaintDeviceName -ScriptBlock {Update-Module PSWindowsUpdate -force}
+}
 
 # Import PSWindowsUpdate module
 DS_WriteLog "I" "Import PSWindowsUpdate module"
@@ -115,7 +141,7 @@ Do{
 				Write-Host "Windows Update service is now running" `n
 				}
 			}
-			Write-Host "FSLogix rules will be temporarily moved, if there are any"`n
+			Write-Host "FSLogix rules will be temporarily moved, if there are any..."`n
 			New-Item -Path "C:\Program Files\FSLogix\Apps\Rules" -Name WU -ItemType Directory -EA SilentlyContinue | Out-Null
 			Move-Item -Path "C:\Program Files\FSLogix\Apps\Rules\*.*" "C:\Program Files\FSLogix\Apps\Rules\WU" | Out-Null
 	}
@@ -124,7 +150,8 @@ Do{
 	#Write-Host -ForegroundColor Yellow "Checking for new updates available on '$MaintDeviceName'"`n
 	Write-Host `n
 	invoke-command -session $session -scriptblock {
-		$HideList = "KB4481252", "KB4023307", "KB4017094", "KB4013867"
+		# Add updates, you don't want to search for
+		$HideList = "KB4481252", "KB4023307", "KB4017094", "KB4013867", "KB4535680"
 		Get-WindowsUpdate -KBArticleID $HideList -Hide -Confirm:$false
 	}
 	$Updates = invoke-command -session $session -scriptblock {Get-WindowsUpdate -NotCategory 'Drivers' -Criteria "Type='Software' AND IsInstalled=0" -AcceptAll -Verbose}
@@ -165,17 +192,20 @@ Do{
 			Restart-Computer -Wait -ComputerName $MaintDeviceName -Force
     }
 } Until ($Updates -eq $Null)
+}
 
 DS_WriteLog "I" "Windows is now up to date on '$MaintDeviceName'"
 Write-Host -ForegroundColor Green "Windows is now up to date on '$MaintDeviceName'"`n
 Get-Content \\$MaintDeviceName\c$\PSWindowsUpdate.log
 Write-Host `n
-DS_WriteLog "I" "Moving FSLogix rules back to rules folder"
+DS_WriteLog "I" "Moving FSLogix rules back to rules folder..."
 Write-Host "Moving FSLogix rules back to rules folder"`n
 invoke-command -computername $MaintDeviceName -ScriptBlock {Move-Item -Path "C:\Program Files\FSLogix\Apps\Rules\WU\*.*" "C:\Program Files\FSLogix\Apps\Rules" | Out-Null}
 
 #Copy log to PVS server
-if (Test-Path -Path "\\$MaintDeviceName\c$\PSWindowsUpdate.log") {Copy-Item "\\$MaintDeviceName\c$\PSWindowsUpdate.log" $WULogPath | Rename-Item "$WULogPath\PSWindowsUpdate.log" -NewName "WindowsUpdate-$MaintDeviceName-$vDiskName-$MaintVersion-$Date.log"}
+if (Test-Path -Path "\\$MaintDeviceName\c$\PSWindowsUpdate.log") {
+	Copy-Item "\\$MaintDeviceName\c$\PSWindowsUpdate.log" $WULog | Rename-Item "$WULog\PSWindowsUpdate.log" -NewName "WindowsUpdate-$MaintDeviceName-$vDiskName-$MaintVersion-$Date.log"
+	}
 
 # Shutdown VM with BIS-F
 DS_WriteLog "I" "Shutdown VM with BIS-F"
@@ -185,10 +215,11 @@ IF ($BISF -eq "YES") {
 		(Get-WmiObject -Class Win32_logicaldisk -Filter "DriveType = '3'" | Where-Object {$_.DeviceID -ne "C:"}).DeviceID
 		}
 	$CacheDrive = $CacheDrive -replace (":","$")
-	Invoke-Command -ComputerName $MaintDeviceName -ScriptBlock {
-		$BISFLogLocation = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Login Consultants\BISF" -Name LIC_BISF_CLI_LS -ErrorAction SilentlyContinue).LIC_BISF_CLI_LS 		
+	$BISFLogLocation = Invoke-Command -ComputerName $MaintDeviceName -ScriptBlock {
+		(Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Login Consultants\BISF" -Name LIC_BISF_CLI_LS -ErrorAction SilentlyContinue).LIC_BISF_CLI_LS 		
 		}
-	
+		Write-Host "BIS-F Log location is '$BISFLogLocation'"`n
+		
 	Write-Host -ForegroundColor Yellow "Starting BIS-F to seal the image"`n
 	$BISFTask = Invoke-Command -ComputerName $MaintDeviceName -ScriptBlock {Get-ScheduledTask -TaskName "BIS-F" -ErrorAction SilentlyContinue}
 	IF ($BISFTask -eq $Null) {
@@ -202,6 +233,7 @@ IF ($BISF -eq "YES") {
 	IF ([string]::ISNullOrEmpty( $BISFLogLocation) -eq $True) {
 		Do {
 			$BISFLog = ((Get-ChildItem -Path "\\$MaintDeviceName\$CacheDrive\BISFLogs") | Sort-Object LastWriteTime -Descending | Select-Object -First 1).Name
+			Write-Host "BIS-F Log is '$BISFLog'"
 			$BISFStatus = Get-Content "\\$MaintDeviceName\$CacheDrive\BISFLogs\$BISFLog"
 			Get-Content "\\$MaintDeviceName\$CacheDrive\BISFLogs\$BISFLog" | select-object -Last 1
 			Start-Sleep -Seconds 1
@@ -211,6 +243,7 @@ IF ($BISF -eq "YES") {
 	ELSE {
 		Do {
 			$BISFLog = ((Get-ChildItem -Path "$BISFLogLocation\$MaintDeviceName") | Sort-Object LastWriteTime -Descending | Select-Object -First 1).Name
+			Write-Host "BIS-F Log is '$BISFLog'"
 			$BISFStatus = Get-Content "$BISFLogLocation\$MaintDeviceName\$BISFLog"
 			Get-Content "$BISFLogLocation\$MaintDeviceName\$BISFLog" | Select-Object -Last 1
 			Start-Sleep -Seconds 1
@@ -276,5 +309,9 @@ Get-PvsDiskVersion -Name $vDiskName -SiteName $SiteName -StoreName $StoreName | 
 Write-Host -ForegroundColor Green `n"Ready! vDisk $vDiskName replicated" `n
 
 DS_WriteLog "I" "Ready, start device in test mode to check vDisk!"
-Rename-Item -Path $WULog -NewName "Windows Update-$MaintDeviceName-$Date.log"
+Rename-Item -Path $WULog -NewName "Windows Update-$MaintDeviceName-$Date.log" -Force -EA SilentlyContinue
 Write-Host -ForegroundColor Green "Ready, start device in test mode to check vDisk!"
+
+# Replicate vDisk
+Write-Host -ForegroundColor Yellow "Executing vDisk replication script" `n
+."$Rootfolder\vDisk Replication\Replicate PVS vDisk.ps1"

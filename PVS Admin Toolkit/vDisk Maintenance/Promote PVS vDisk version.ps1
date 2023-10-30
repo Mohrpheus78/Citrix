@@ -55,10 +55,10 @@ Use-RunAs
 # Variables
 $RootFolder = Split-Path -Path $PSScriptRoot
 $Date = Get-Date -UFormat "%d.%m.%Y"
-$Log = "$RootFolder\Logs\Promote PVS vDisk version.log"
+$PromotevDiskLog = "$RootFolder\Logs\Promote PVS vDisk version.log"
 
 # Start logging
-Start-Transcript $Log | Out-Null
+Start-Transcript $PromotevDiskLog | Out-Null
 
 $ScriptStart = Get-Date
 
@@ -185,8 +185,8 @@ $ScriptRuntimeInSeconds = $ScriptRuntime.TotalSeconds
 Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSeconds seconds"
 
 Stop-Transcript | Out-Null
-$Content = Get-Content -Path $Log | Select-Object -Skip 18
-Set-Content -Value $Content -Path $Log
-Rename-Item -Path $Log -NewName "Promote PVS vDisk version-$vDiskName-$Date.log"
+$Content = Get-Content -Path $PromotevDiskLog | Select-Object -Skip 18
+Set-Content -Value $Content -Path $PromotevDiskLog
+Rename-Item -Path $PromotevDiskLog -NewName "Promote PVS vDisk version-$vDiskName-$Date.log" -Force -EA SilentlyContinue
 
 Read-Host "Press any key to exit"

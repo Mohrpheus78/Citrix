@@ -207,6 +207,6 @@ Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSecon
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $Log | Select-Object -Skip 18
 Set-Content -Value $Content -Path $Log
-Rename-Item -Path $Log -NewName "Merge PVS vDisks-$vDiskName-$Date.log"
+Rename-Item -Path $Log -NewName "Merge PVS vDisks-$vDiskName-$Date.log" -EA SilentlyContinue
 
 Read-Host "Press any key to exit"

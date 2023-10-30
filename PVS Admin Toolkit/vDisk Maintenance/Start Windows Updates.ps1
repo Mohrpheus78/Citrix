@@ -80,4 +80,4 @@ Write-Host -ForegroundColor Yellow "Installing Windows Updates into a maintenanc
 Stop-Transcript | Out-Null
 $Content = Get-Content -Path $WindowsUpdatesLog | Select-Object -Skip 18
 Set-Content -Value $Content -Path $WindowsUpdatesLog
-Rename-Item -Path $WindowsUpdatesLog -NewName "Start Windows Update-$MaintDeviceName-$Date.log"
+Rename-Item -Path $WindowsUpdatesLog -NewName "Start Windows Update-$MaintDeviceName-$Date.log" -Force -EA SilentlyContinue

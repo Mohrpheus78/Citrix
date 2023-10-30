@@ -55,11 +55,12 @@ Use-RunAs
 # Variables
 $RootFolder = Split-Path -Path $PSScriptRoot
 $Date = Get-Date -UFormat "%d.%m.%Y"
-$Log = "$RootFolder\Logs\New PVS vDisk version.log"
+$Time = Get-Date -DisplayHint Time | foreach {$_ -replace ":", "-"}
+$NewvDiskLog = "$RootFolder\Logs\New PVS vDisk version-$Time.log"
 write-host $StartMaster
 
 # Start logging
-Start-Transcript $Log | Out-Null
+Start-Transcript $NewvDiskLog | Out-Null
 
 $ScriptStart = Get-Date
 
@@ -109,34 +110,63 @@ $AllvDisks | ForEach-Object {
 }
 
 # Create new vDisk version if possible
-$CanPromote = ((Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName) | Select-Object -First 1).CanPromote
-if ($CanPromote) {
-    Write-Host -ForegroundColor Red "Current vDisk version is alreadey a in 'Maintenance' mode or in 'Test' mode, aborting!"
-	IF (-not(Test-Path variable:Task) -or $Task -eq $false) {
-	Read-Host "Press any key to exit"
+IF (-not(Test-Path variable:Task) -or $Task -eq $false) {
+	$CanPromote = ((Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName) | Select-Object -First 1).CanPromote
+	if ($CanPromote) {
+		Write-Host -ForegroundColor Red "Current vDisk version is alreadey a in 'Maintenance' mode or in 'Test' mode!"`n
+		
+		$title = ""
+		$message = "Do you want to use this version?"
+		$yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes"
+		$no = New-Object System.Management.Automation.Host.ChoiceDescription "&No"
+		$options = [System.Management.Automation.Host.ChoiceDescription[]]($yes, $no)
+		$choice=$host.ui.PromptForChoice($title, $message, $options, 0)
+
+		switch ($choice) {
+			0 {
+			$answer1 = 'Yes'       
+			}
+			1 {
+			$answer1 = 'No'
+			}
+		}
+
+		if ($answer1 -eq 'Yes') {
+			# Stop Logging
+			$ScriptEnd = Get-Date
+			$ScriptRuntime =  $ScriptEnd - $ScriptStart | Select-Object TotalSeconds
+			$ScriptRuntimeInSeconds = $ScriptRuntime.TotalSeconds
+			Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSeconds seconds"`n
+
+			Stop-Transcript | Out-Null
+			$Content = Get-Content -Path $NewvDiskLog | Select-Object -Skip 18
+			Set-Content -Value $Content -Path $NewvDiskLog
+			Rename-Item -Path $NewvDiskLog -NewName "New PVS vDisk version-vDisk $vDiskName-Version $MaintVersion-$Date.log" -Force -EA SilentlyContinue
+		}
+
+		if ($answer1 -eq 'No') {
+			Read-Host "Press any key to exit"
+			BREAK
+		}
 	}
-    BREAK
+	else {
+		# New maintenance version
+		New-PvsDiskMaintenanceVersion -DiskLocatorName $vDiskName -StoreName $StoreName -SiteName $SiteName | Out-Null
+		$MaintVersion = (Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName | Select-Object -First 1).Version
+		Write-Host -ForegroundColor Green `n"New Version '$MaintVersion' successfully created, check logfile '$NewvDiskLog'"`n
+	}
 }
+else {
+	# New maintenance version if launched with task
+	New-PvsDiskMaintenanceVersion -DiskLocatorName $vDiskName -StoreName $StoreName -SiteName $SiteName | Out-Null
+	$MaintVersion = (Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName | Select-Object -First 1).Version
+	Write-Host -ForegroundColor Green `n"New Version '$MaintVersion' successfully created, check logfile '$NewvDiskLog'"`n
+}	
 
-# New maintenance version
-New-PvsDiskMaintenanceVersion -DiskLocatorName $vDiskName -StoreName $StoreName -SiteName $SiteName | Out-Null
-$MaintVersion = (Get-PvsDiskVersion -DiskLocatorName $vDiskName -SiteName $SiteName -StoreName $StoreName | Select-Object -First 1).Version
-Write-Host -ForegroundColor Green `n"New Version '$MaintVersion' successfully created, check logfile '$log'"`n
-
-# Stop Logging
-$ScriptEnd = Get-Date
-$ScriptRuntime =  $ScriptEnd - $ScriptStart | Select-Object TotalSeconds
-$ScriptRuntimeInSeconds = $ScriptRuntime.TotalSeconds
-Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSeconds seconds"`n
-
-Stop-Transcript | Out-Null
-$Content = Get-Content -Path $Log | Select-Object -Skip 18
-Set-Content -Value $Content -Path $Log
-Rename-Item -Path $Log -NewName "New PVS vDisk version-vDisk $vDiskName-Version $MaintVersion-$Date.log" -EA SilentlyContinue
-
+	
 # Start Master VM? Default Yes if doing Windows Updates
 IF ((Test-Path variable:Task) -or ($WindowsUpdates -eq $True) -or ($Task -eq $true)) {
-."$PSScriptRoot\Start Master.ps1"
+	."$PSScriptRoot\Start Master.ps1"
 }
 Else {
 	$title = ""
@@ -148,18 +178,24 @@ Else {
 
 	switch ($choice) {
 		0 {
-		$answer = 'Yes'       
+		$answer2 = 'Yes'       
 		}
 		1 {
-		$answer = 'No'
+		$answer2 = 'No'
 		}
 	}
 
-	if ($answer -eq 'Yes') {
+	if ($answer2 -eq 'Yes') {
 		."$PSScriptRoot\Start Master.ps1"
 	}
 }
 
-IF (-not(Test-Path variable:Task) -or $Task -eq $false) {
+IF (-not(Test-Path variable:Task) -or ($Task -eq $false)) {
 	Read-Host "Press any key to exit"
 }
+	
+# Stop Logging
+Stop-Transcript | Out-Null
+$Content = Get-Content -Path $NewvDiskLog | Select-Object -Skip 18
+Set-Content -Value $Content -Path $NewvDiskLog
+Rename-Item -Path $NewvDiskLog -NewName "New PVS vDisk version-$vDiskName-$Date.log" -Force -EA SilentlyContinue

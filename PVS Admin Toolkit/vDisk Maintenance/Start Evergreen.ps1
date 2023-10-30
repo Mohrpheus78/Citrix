@@ -33,11 +33,11 @@ param
 # Variables
 $Date = Get-Date -UFormat "%d.%m.%Y"
 $RootFolder = Split-Path -Path $PSScriptRoot
-$Log = "$RootFolder\Logs\Start Evergreen.log"
+$StartEvergreenLog = "$RootFolder\Logs\Start Evergreen.log"
 $Evergreen = "True"
 
 # Start logging
-Start-Transcript $Log | Out-Null
+Start-Transcript $StartEvergreenLog | Out-Null
 
 # RunAs Admin
 function Use-RunAs 
@@ -79,6 +79,6 @@ Write-Host -ForegroundColor Yellow "Executing Evergreen script inside a maintena
 
 # Stop Logging
 Stop-Transcript | Out-Null
-$Content = Get-Content -Path $Log | Select-Object -Skip 18
-Set-Content -Value $Content -Path $Log
-Rename-Item -Path $Log -NewName "Start-Evergreen-$Date.log"
+$Content = Get-Content -Path $StartEvergreenLog | Select-Object -Skip 18
+Set-Content -Value $Content -Path $StartEvergreenLog
+Rename-Item -Path $StartEvergreenLog -NewName "Start-Evergreen-$vDiskName-$Date.log" -Force -EA SilentlyContinue

@@ -14,6 +14,7 @@ Purpose/Change:
 2021-10-30		Inital version
 2022-02-06		Added Windows Updates and configuration menu
 2022-02-18		Added Evergreen
+2022-12-20		Changed Evergreen to my own Evergreen scripts
 #>
 
 # Force garbage collection just to start slightly lower RAM usage
@@ -55,22 +56,28 @@ $Menu_4 = $contextmenu.Items.Add("Windows Update");
 $Menu_4.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Maintenance\Windows Update.png")
 
 $Menu_5 = $contextmenu.Items.Add("Evergreen");
-$Menu_5.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\Evergreen\Evergreen.png")
+$Menu_5.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\Evergreen\Evergreen.ico")
 
-$Menu_6 = $contextmenu.Items.Add("Document vDisk versions");
-$Menu_6.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Documentation\PVS vDisk versions.png")
+$Menu_6 = $contextmenu.Items.Add("Create new PVS devices");
+$Menu_6.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\PVS\Devices.png")
 
-$Menu_7 = $contextmenu.Items.Add("Merge vDisk");
-$Menu_7.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Merge\Merge PVS vDisk.png")
+$Menu_7 = $contextmenu.Items.Add("Document vDisk versions");
+$Menu_7.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Documentation\PVS vDisk versions.png")
 
-$Menu_8 = $contextmenu.Items.Add("Replicate vDisk");
-$Menu_8.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Replication\Replicate PVS vDisk.png")
+$Menu_8 = $contextmenu.Items.Add("Merge vDisk");
+$Menu_8.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Merge\Merge PVS vDisk.png")
 
-$Menu_9 = $contextmenu.Items.Add("Export all vDisks (XML)");
-$Menu_9.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Export\Export PVS vDisk.png")
+$Menu_9 = $contextmenu.Items.Add("Replicate vDisk");
+$Menu_9.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Replication\Replicate PVS vDisk.png")
 
-$Menu_10 = $contextmenu.Items.Add("Shrink vDisk");
-$Menu_10.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Shrink\Shrink PVS vDisk.png")
+$Menu_10 = $contextmenu.Items.Add("Export all vDisks (XML)");
+$Menu_10.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Export\Export PVS vDisk.png")
+
+$Menu_11 = $contextmenu.Items.Add("Shrink vDisk");
+$Menu_11.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\vDisk Shrink\Shrink PVS vDisk.png")
+
+$Menu_12 = $contextmenu.Items.Add("Remove log files");
+$Menu_12.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\Logs.ico")
 
 $Menu_Exit = $contextmenu.Items.Add("Exit");
 $Menu_Exit.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\Exit.png")
@@ -88,7 +95,7 @@ $Menu_1.DropDownItems.Add($Menu1_SubMenu2)
 
 $Menu1_SubMenu3 = New-Object System.Windows.Forms.ToolStripMenuItem
 $Menu1_SubMenu3.Text = "Evergreen configuration"
-$Menu1_SubMenu3.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\Evergreen\Evergreen.png")
+$Menu1_SubMenu3.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\Evergreen\Evergreen.ico")
 $Menu_1.DropDownItems.Add($Menu1_SubMenu3)
 
 #Sub menus for Menu 3
@@ -116,7 +123,7 @@ $Menu_4.DropDownItems.Add($Menu4_SubMenu2)
 #Sub menu for Menu 5
 $Menu5_SubMenu1 = New-Object System.Windows.Forms.ToolStripMenuItem
 $Menu5_SubMenu1.Text = "Launch Evergreen script on vDisk"
-$Menu5_SubMenu1.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\Evergreen\Evergreen.png")
+$Menu5_SubMenu1.Image = [System.Drawing.Bitmap]::FromFile("$PSScriptRoot\Evergreen\Evergreen.ico")
 $Menu_5.DropDownItems.Add($Menu5_SubMenu1)
 
 $Menu5_SubMenu2 = New-Object System.Windows.Forms.ToolStripMenuItem
@@ -176,29 +183,39 @@ $Menu5_SubMenu2.add_Click({
 	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Maintenance\Evergreen Task.ps1`""
 	start-process powershell.exe -ArgumentList $args
 	})
-
+	
 $Menu_6.add_Click({
-	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Documentation\PVS vDisk versions.ps1`""
+	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\PVS\Create PVS devices.ps1`""
 	start-process powershell.exe -ArgumentList $args
 	})
 
 $Menu_7.add_Click({
-	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Merge\Merge PVS vDisk.ps1`""
+	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Documentation\PVS vDisk versions.ps1`""
 	start-process powershell.exe -ArgumentList $args
 	})
 
 $Menu_8.add_Click({
-	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Replication\Replicate PVS vDisk.ps1`""
+	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Merge\Merge PVS vDisk.ps1`""
 	start-process powershell.exe -ArgumentList $args
 	})
 
 $Menu_9.add_Click({
-	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Export\Export PVS vDisk.ps1`""
+	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Replication\Replicate PVS vDisk.ps1`""
 	start-process powershell.exe -ArgumentList $args
 	})
 
 $Menu_10.add_Click({
+	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Export\Export PVS vDisk.ps1`""
+	start-process powershell.exe -ArgumentList $args
+	})
+
+$Menu_11.add_Click({
 	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\vDisk Shrink\Shrink PVS vDisk.ps1`""
+	start-process powershell.exe -ArgumentList $args
+	})
+	
+$Menu_12.add_Click({
+	$args = "-NoProfile -NoLogo -WindowStyle Maximized -ExecutionPolicy Bypass -File `"$PSScriptRoot\Remove logs.ps1`""
 	start-process powershell.exe -ArgumentList $args
 	})
 
@@ -212,9 +229,11 @@ $Menu_Exit.add_Click({
 	$Systray_Tool_Icon.Visible = $false 
 	Stop-Process $pid
 	})
- 
+	
 # Create an application context for it to all run within.
 $appContext = New-Object System.Windows.Forms.ApplicationContext
 [void][System.Windows.Forms.Application]::Run($appContext)
 
+
+	
 

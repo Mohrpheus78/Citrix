@@ -60,23 +60,40 @@ IF ($null -eq (Get-PSSnapin "Citrix.PVS.SnapIn" -EA silentlycontinue)) {
 		write-error "Error loading Citrix.PVS.SnapIn PowerShell snapin"; Return }
 	}
 
+# Get PVS Site
+$SiteName = (Get-PvsSite).SiteName
+
+# Get PVS device in maintenance mode for the selected vDisk
+$MaintDeviceNameWindows = (Get-PvsDeviceInfo -SiteName $SiteName | where-Object {$_.Type -eq 2 -and $_.DiskLocatorName -like "*$StoreName\$vDiskName*"}).Name
+$MaintDeviceName = (Get-PvsDeviceInfo -SiteName $SiteName | where-Object {$_.Type -eq 2 -and $_.DiskLocatorName -like "*$vDiskName*"}).Name
+$vDisks = (Get-PvsDeviceInfo -DeviceName $MaintDeviceName).DiskLocatorName
+$vDisks = $vDisks.Split(",").Trim()
+
 # Variables
 $RootFolder = Split-Path -Path $PSScriptRoot
 $Date = Get-Date -UFormat "%d.%m.%Y"
-$Log = "$RootFolder\Logs\Start-Master-VM.log"
+$StartMasterLog = "$RootFolder\Logs\Start-Master-$MaintDeviceName.log"
 $HypervisorConfig = Import-Clixml "$RootFolder\Hypervisor\Hypervisor.xml"
 $Hypervisor = $HypervisorConfig.Hypervisor
 $PVSConfig = Import-Clixml "$RootFolder\PVS\PVS.xml"
 
 # Start logging
-Start-Transcript $Log | Out-Null
+Start-Transcript $StartMasterLog | Out-Null
 
-# Get PVS Site
-$SiteName = (Get-PvsSite).SiteName
-
-# Get PVS device in maintenance mode for the selected vDisk
-$MaintDeviceName = (Get-PvsDeviceInfo -SiteName $SiteName | where-Object {$_.Type -eq 2 -and $_.DiskLocatorName -eq "$StoreName\$vDiskName"}).Name
-$MaintDeviceNameWindows = (Get-PvsDeviceInfo -SiteName $SiteName | where-Object {$_.Type -eq 2 -and $_.DiskLocatorName -eq "$StoreName\$vDiskName"}).Name
+# Check if more than one vDisk is attached
+$SkipBootMenu = $PVSConfig.SkipBootMenu
+IF ($vDisks.Count -gt 1) {
+    Write-Host -ForegroundColor Red "Attention! $MaintDeviceName has more than one vDisks attached! Check if $MaintDeviceName is able to boot!"`n
+	IF ($SkipBootMenu -eq 'Yes') {
+		IF (!("$StoreName\$vDiskName" -contains $vDisks[0])) {
+		Write-Host -ForegroundColor Red "Error, you selected vDisk $StoreName\$vDiskName but '$MaintDeviceName' will boot vDisk"$vDisks[0]"!"`n
+			IF (-not(Test-Path variable:Task) -or $Task -eq $false) {
+			Read-Host "Press any key to exit"
+			}
+			BREAK
+		}
+	}
+}
 
 # Citrix XenServer
 IF ($Hypervisor -eq "Xen") {
@@ -86,27 +103,27 @@ IF ($Hypervisor -eq "Xen") {
 	Read-Host "Press any key to exit"
 	BREAK
 	}
-Import-Module XenServerPSModule | Out-Null
-$Xen = $HypervisorConfig.Host
-$Credential = Import-CliXml -Path "$RootFolder\Hypervisor\Credentials-Xen.xml"	
-Try {
-	Connect-XenServer -url https://$Xen -Creds $Credential -NoWarnNewCertificates -SetDefaultSession | Out-Null
+	Import-Module XenServerPSModule | Out-Null
+	$Xen = $HypervisorConfig.Host
+	$Credential = Import-CliXml -Path "$RootFolder\Hypervisor\Credentials-$env:username-Xen.xml"	
+	Try {
+		Connect-XenServer -url https://$Xen -Creds $Credential -NoWarnNewCertificates -SetDefaultSession | Out-Null
+	}
+	Catch {
+		 write-warning "Error: $_."
+	}
 	IF (-not(Get-XenVM | Where-Object {$_.name_label -eq "$MaintDeviceName"})) {
 		$MaintDeviceName = $PVSConfig.MaintDeviceName
 	}
-		IF (Get-XenVM | Where {$_.name_label -eq "$MaintDeviceName" -and $_.power_state -eq "Halted" -and $_.is_a_template -eq $False}) {
+		IF (Get-XenVM | Where-Object {$_.name_label -eq "$MaintDeviceName" -and $_.power_state -eq "Halted" -and $_.is_a_template -eq $False}) {
 			Do {
 				Write-Host `n
 				Write-Output "Starting VM '$MaintDeviceName'"
 				Invoke-XenVM -Name "$MaintDeviceName" -XenAction Start | Out-Null
-				} Until (Get-XenVM | Where {$_.name_label -eq "$MaintDeviceName" -and $_.power_state -eq "Running"}) 
+				} Until (Get-XenVM | Where-Object {$_.name_label -eq "$MaintDeviceName" -and $_.power_state -eq "Running"}) 
 				Write-Host `n
 				Write-Output "'$MaintDeviceName' successfully powered on"
 		}
-	}
-	Catch {
-	 write-warning "Error: $_."
-	}
 }
 
 # VMWare vSphere
@@ -117,28 +134,30 @@ IF ($Hypervisor -eq "ESX") {
 	Read-Host "Press any key to exit"
 	BREAK
 	}
-$ESX = $HypervisorConfig.Host
-$Credential = Import-CliXml -Path "$RootFolder\Hypervisor\Credentials-ESX.xml"
+	$ESX = $HypervisorConfig.Host
+	$Credential = Import-CliXml -Path "$RootFolder\Hypervisor\Credentials-$env:username-ESX.xml"
 	Try {
 		Set-PowerCLIConfiguration -Scope AllUsers -ParticipateInCEIP $false -Confirm:$false | Out-Null
 		Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -confirm:$false | Out-Null
 		Connect-VIServer -server $ESX -Credential $Credential
-		IF (-not(Get-VM | Where-Object {$_.Name -eq "$MaintDeviceName"})) {
-			$MaintDeviceName = $PVSConfig.MaintDeviceName
-		}		
-		IF (Get-VM -Name "$MaintDeviceName" | Where-Object {$_.PowerState -eq "PoweredOff"}) {
-			Do {
-				Write-Host `n
-				Write-Output "Starting VM '$MaintDeviceName'"
-				Start-VM -VM "$MaintDeviceName" | Out-Null
-				} Until (Get-VM | Where {$_.Name -eq "$MaintDeviceName" -and $_.PowerState -eq "PoweredOn"})
-				Write-Host `n
-				Write-Output "'$MaintDeviceName' successfully powered on"
-		}
 	}
 	Catch {
-	 write-warning "Error: $_."
+		write-warning "Error: $_."
+		BREAK
 	}
+	IF (-not(Get-VM | Where-Object {$_.Name -eq "$MaintDeviceName"})) {
+		$MaintDeviceName = $PVSConfig.MaintDeviceName
+	}		
+	IF (Get-VM -Name "$MaintDeviceName" | Where-Object {$_.PowerState -eq "PoweredOff"}) {
+		Do {
+			Write-Host `n
+			Write-Output "Starting VM '$MaintDeviceName'"
+			Start-VM -VM "$MaintDeviceName" | Out-Null
+			} Until (Get-VM | Where-Object {$_.Name -eq "$MaintDeviceName" -and $_.PowerState -eq "PoweredOn"})
+			Write-Host `n
+			Write-Output "'$MaintDeviceName' successfully powered on"
+	}
+	
 }
 
 # Nutanix AHV
@@ -170,7 +189,7 @@ IF ($Hypervisor -eq "AHV") {
 				Write-Host `n
 				Write-Output "Starting VM '$MaintDeviceName'"
 				Start-NTNXVM -Uuid $UUID | Out-Null
-				} Until (Get-NTNXVirtualMachine | Where {$_.Name -eq "$MaintDeviceName" -and $_.PowerState -eq "ON"})
+				} Until (Get-NTNXVirtualMachine | Where-Object {$_.Name -eq "$MaintDeviceName" -and $_.PowerState -eq "ON"})
 				Write-Host `n
 				Write-Output "'$MaintDeviceName' successfully powered on"
 		}
@@ -185,9 +204,9 @@ $connectiontimeout = 0
 Do {
 	Write-Host `n
     Write-Host "Waiting for '$MaintDeviceNameWindows' to boot..." `n
-    sleep 5
+    Start-Sleep 5
     $connectiontimeout++
-   } until (Test-NetConnection "$MaintDeviceNameWindows.$ENV:USERDNSDOMAIN" -Port 5985 | ? {$_.TcpTestSucceeded -or $connectiontimeout -ge 10})
+   } until (Test-NetConnection "$MaintDeviceNameWindows.$ENV:USERDNSDOMAIN" -Port 5985 | Where-Object {$_.TcpTestSucceeded -or $connectiontimeout -ge 10})
 IF ($connectiontimeout -eq 15) {
     Write-Host -ForegroundColor Red "Something is wrong, server not reachable, check the status of $MaintDeviceNameWindows, hit any key to exit"
 	# Stop Logging
@@ -196,9 +215,9 @@ IF ($connectiontimeout -eq 15) {
 	$ScriptRuntimeInSeconds = $ScriptRuntime.TotalSeconds
 	Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSeconds seconds" `n
 	Stop-Transcript #| Out-Null
-	$Content = Get-Content -Path $Log | Select-Object -Skip 18
-	Set-Content -Value $Content -Path $Log
-	Rename-Item -Path $Log -NewName "Start-Master-VM-$MaintDeviceNameWindows-$Date.log"
+	$Content = Get-Content -Path $StartMasterLog | Select-Object -Skip 18
+	Set-Content -Value $Content -Path $StartMasterLog
+	Rename-Item -Path $StartMasterLog -NewName "Start-Master-VM-$MaintDeviceNameWindows-$Date.log"
 	Read-Host
 	BREAK
     }
@@ -207,7 +226,7 @@ else {
       Write-Host -ForegroundColor Green "Server '$MaintDeviceNameWindows' finished booting" `n
       }
 
-IF ($WindowsUpdates -ne "True") {
+IF (!($WindowsUpdates -or $Evergreen)) {
 # Connect to master?
 $title = ""
 	$message = "Do you want to connect to the master VM via RDP?"
@@ -230,9 +249,9 @@ $title = ""
 		Do {
 			Write-Host `n
 			Write-Host "Check if '$MaintDeviceNameWindows' is ready to connect..." `n
-			sleep 5
+			Start-Sleep 5
 			$connectiontimeout++
-		   } until (Test-NetConnection "$MaintDeviceNameWindows.$ENV:USERDNSDOMAIN" -Port 3389 | ? {$_.TcpTestSucceeded -or $connectiontimeout -ge 5})
+		   } until (Test-NetConnection "$MaintDeviceNameWindows.$ENV:USERDNSDOMAIN" -Port 3389 | Where-Object {$_.TcpTestSucceeded -or $connectiontimeout -ge 5})
 		   start-process mstsc.exe -ArgumentList "/f /admin /v:$MaintDeviceNameWindows"
 		IF ($connectiontimeout -eq 10) {
 			Write-Host -ForegroundColor Red "Something is wrong, server not reachable, check the status of $MaintDeviceNameWindows"
@@ -246,9 +265,9 @@ $ScriptRuntime =  $ScriptEnd - $ScriptStart | Select-Object TotalSeconds
 $ScriptRuntimeInSeconds = $ScriptRuntime.TotalSeconds
 Write-Host -ForegroundColor Yellow "Script was running for $ScriptRuntimeInSeconds seconds" `n
 Stop-Transcript #| Out-Null
-$Content = Get-Content -Path $Log | Select-Object -Skip 18
-Set-Content -Value $Content -Path $Log
-Rename-Item -Path $Log -NewName "Start-Master-VM-$MaintDeviceNameWindows-$Date.log" -EA SilentlyContinue
+$Content = Get-Content -Path $StartMasterLog | Select-Object -Skip 18
+Set-Content -Value $Content -Path $StartMasterLog
+Rename-Item -Path $StartMasterLog -NewName "Start-Master-VM-$MaintDeviceNameWindows-$Date.log" -Force -EA SilentlyContinue
 
 # Install Windows Updates
 IF ($WindowsUpdates -eq "True") {
