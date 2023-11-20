@@ -110,7 +110,10 @@ IF ($Hypervisor -eq "Xen") {
 		Connect-XenServer -url https://$Xen -Creds $Credential -NoWarnNewCertificates -SetDefaultSession | Out-Null
 	}
 	Catch {
-		 write-warning "Error: $_."
+		 Write-Warning "Error: $_."
+		 Write-Host -ForegroundColor Red "Unable to connect to configured XenServer '$Xen', check your configuration!"
+		 Read-Host
+		 BREAK
 	}
 	IF (-not(Get-XenVM | Where-Object {$_.name_label -eq "$MaintDeviceName"})) {
 		$MaintDeviceName = $PVSConfig.MaintDeviceName
@@ -142,7 +145,9 @@ IF ($Hypervisor -eq "ESX") {
 		Connect-VIServer -server $ESX -Credential $Credential
 	}
 	Catch {
-		write-warning "Error: $_."
+		Write-Warning "Error: $_."
+		Write-Host -ForegroundColor Red "Unable to connect to configured XenServer '$ESX', check your configuration!"
+		Read-Host
 		BREAK
 	}
 	IF (-not(Get-VM | Where-Object {$_.Name -eq "$MaintDeviceName"})) {
@@ -170,7 +175,7 @@ IF ($Hypervisor -eq "AHV") {
 	}
 	IF (!(Get-Module -ListAvailable -Name Nutanix.Cli)) {
 	Write-Host -ForegroundColor Red "No Nutanix Powershell module found, aborting! Please install module to 'C:\Program Files\WindowsPowerShell\Modules'"
-	Read-Host "Press any key to exit"
+	Read-Host
 	BREAK
 	}
 	Import-Module Nutanix.Prism.PS.Cmds -Prefix NTNX 
@@ -195,7 +200,10 @@ IF ($Hypervisor -eq "AHV") {
 		}
 	}
 	Catch {
-	 write-warning "Error: $_."
+		Write-Warning "Error: $_."
+		Write-Host -ForegroundColor Red "Unable to connect to configured XenServer '$AHV', check your configuration!"
+		Read-Host
+		BREAK
 	}
 }
 
@@ -204,7 +212,7 @@ $connectiontimeout = 0
 Do {
 	Write-Host `n
     Write-Host "Waiting for '$MaintDeviceNameWindows' to boot..." `n
-    Start-Sleep 5
+    Start-Sleep 8
     $connectiontimeout++
    } until (Test-NetConnection "$MaintDeviceNameWindows.$ENV:USERDNSDOMAIN" -Port 5985 | Where-Object {$_.TcpTestSucceeded -or $connectiontimeout -ge 10})
 IF ($connectiontimeout -eq 15) {
