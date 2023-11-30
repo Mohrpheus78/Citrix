@@ -67,7 +67,7 @@ IF ($Hypervisor -eq "Xen") {
 
 # Connect to Xen host
 $Xen = $HypervisorConfig.Host
-$Credential = Import-CliXml -Path "$RootFolder\Hypervisor\Credentials-Xen.xml"	
+$Credential = Import-CliXml -Path "$RootFolder\Hypervisor\Credentials-$ENV:Username-Xen.xml"	
 Try {
 	Connect-XenServer -url https://$Xen -Creds $Credential -NoWarnNewCertificates -SetDefaultSession | Out-Null
 }
@@ -113,7 +113,7 @@ IF ($Hypervisor -eq "ESX") {
 	BREAK
 	}
 $ESX = $HypervisorConfig.Host
-$Credential = Import-CliXml -Path "$RootFolder\Hypervisor\Credentials-ESX.xml"
+$Credential = Import-CliXml -Path "$RootFolder\Hypervisor\Credentials-$ENV:Username-ESX.xml"
 Try {
 	Set-PowerCLIConfiguration -Scope AllUsers -ParticipateInCEIP $false -Confirm:$false | Out-Null
 	Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -confirm:$false | Out-Null

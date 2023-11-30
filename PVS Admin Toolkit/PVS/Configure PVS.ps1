@@ -287,6 +287,7 @@ $choice=$host.ui.PromptForChoice($title, $message, $options, 0)
 			$DHCPScopeCheck = Get-DhcpServerv4Scope -ComputerName $DHCPHost -ScopeId $DHCPScope -EA SilentlyContinue
 			IF ([string]::ISNullOrEmpty( $DHCPScopeCheck) -eq $True) {
 				Write-Host -Foregroundcolor Red "DHCP scope not found, check scope name and try again!"
+				Read-Host
 				BREAK
 			}
 			Add-member -inputobject $DHCPSelection -MemberType NoteProperty -Name "Scope" -Value $DHCPScope -Force
@@ -296,65 +297,93 @@ $choice=$host.ui.PromptForChoice($title, $message, $options, 0)
 # DHCP options
 		# Check if option 66 is already defined in the scope options
 		if (!(Get-DhcpServerv4OptionValue -ComputerName $DHCPHost -ScopeId $DHCPScope -OptionId 66 -EA SilentlyContinue)) {
-		Write-Host "Configure the DHCP option 66 (TFTP Loadbalancer hostname)"`n
-		if (Test-Path -Path $DHCPConfig) {
-			$DHCPXML = Import-Clixml -Path $DHCPConfig
-			if ($DHCPXML.TFTP) {
-                Write-Host -ForegroundColor Cyan $DHCPXML.TFTP
-				$title = ""
-				$message = "DHCP Option 66 (TFTP Loadbalancer hostname) already configured, do you want to use this option?"
-				$yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes"
-				$no = New-Object System.Management.Automation.Host.ChoiceDescription "&No"
-				$options = [System.Management.Automation.Host.ChoiceDescription[]]($yes, $no)
-				$choice=$host.ui.PromptForChoice($title, $message, $options, 0)
-					switch ($choice) {
-						0 {
-						$Answer4 = 'Yes'       
+			Write-Host "Configure the DHCP option 66 (TFTP Loadbalancer hostname)"`n
+			if (Test-Path -Path $DHCPConfig) {
+				$DHCPXML = Import-Clixml -Path $DHCPConfig
+				if ($DHCPXML.TFTP) {
+					Write-Host -ForegroundColor Cyan $DHCPXML.TFTP
+					$title = ""
+					$message = "DHCP Option 66 (TFTP Loadbalancer hostname) already configured, do you want to use this option?"
+					$yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes"
+					$no = New-Object System.Management.Automation.Host.ChoiceDescription "&No"
+					$options = [System.Management.Automation.Host.ChoiceDescription[]]($yes, $no)
+					$choice=$host.ui.PromptForChoice($title, $message, $options, 0)
+						switch ($choice) {
+							0 {
+							$Answer4 = 'Yes'       
+							}
+							1 {
+							$Answer4 = 'No'
+							}
 						}
-						1 {
-						$Answer4 = 'No'
-						}
-					}
-					Write-Host `n
-			}	
-		}
+						Write-Host `n
+				}	
+			}
 			if ($Answer4 -eq "Yes") {
 				$TFTPServer = $DHCPXML.TFTP
-				Add-member -inputobject $DHCPSelection -MemberType NoteProperty -Name "TFTPBootfile" -Value $TFTPServer -Force
+				Add-member -inputobject $DHCPSelection -MemberType NoteProperty -Name "TFTP" -Value $TFTPServer -Force
 				}
 			else {
-			Write-Host "Configure the DHCP option 66 (TFTP Loadbalancer hostname)"
-			$TFTPServer = Read-Host "Enter a single hostname or Loadbalancer (not FQDN)"
-			Add-member -inputobject $DHCPSelection -MemberType NoteProperty -Name "TFTPBootfile" -Value $TFTPServer -Force
-			Write-Host `n
+				Write-Host "Configure the DHCP option 66 (TFTP Loadbalancer hostname)"
+				$TFTPServer = Read-Host "Enter a single hostname or Loadbalancer (not FQDN)"
+				Add-member -inputobject $DHCPSelection -MemberType NoteProperty -Name "TFTP" -Value $TFTPServer -Force
+				Write-Host `n
+			}
+		}
+		else {
+			$Option66 = (Get-DhcpServerv4OptionValue -ComputerName $DHCPHost -ScopeId $DHCPScope -OptionId 66).Value
+			$title = ""
+			$message = "DHCP Option 66 with value '$Option66' found in scope options, do you want to use this option or create it in the reservation for each device?"
+			$yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes"
+			$no = New-Object System.Management.Automation.Host.ChoiceDescription "&No"
+			$options = [System.Management.Automation.Host.ChoiceDescription[]]($yes, $no)
+			$choice=$host.ui.PromptForChoice($title, $message, $options, 0)
+				switch ($choice) {
+					0 {
+					$Answer5 = 'Yes'       
+					}
+					
+					1 {
+					$Answer5 = 'No'
+					}
+				}
+				Write-Host `n
+				
+			if ($Answer5 -eq "No") {
+				Write-Host "Configure the DHCP option 66 (TFTP Loadbalancer hostname)"
+				$TFTPServer = Read-Host "Enter a single hostname or Loadbalancer (not FQDN)"
+				Add-member -inputobject $DHCPSelection -MemberType NoteProperty -Name "TFTP" -Value $TFTPServer -Force
+				#Add-member -inputobject $DHCPSelection -MemberType NoteProperty -Name "Reservation" -Value $true -Force
+				Write-Host `n
 			}
 		}
 		
+		
 		# Check if option 67 is already defined in the scope options
 		if (!(Get-DhcpServerv4OptionValue -ComputerName $DHCPHost -ScopeId $DHCPScope -OptionId 67 -EA SilentlyContinue)) {
-		Write-Host "Configure the DHCP option 67 (Boot file name, should be pvsnbpx64.efi)"`n
-		if (Test-Path -Path $DHCPConfig) {
-			$DHCPXML = Import-Clixml -Path $DHCPConfig
-			if ($DHCPXML.TFTPBootfile) {
-                Write-Host -ForegroundColor Cyan $DHCPXML.TFTPBootfile
-				$title = ""
-				$message = "DHCP Option 67 (Boot file name) already configured, do you want to use this option?"
-				$yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes"
-				$no = New-Object System.Management.Automation.Host.ChoiceDescription "&No"
-				$options = [System.Management.Automation.Host.ChoiceDescription[]]($yes, $no)
-				$choice=$host.ui.PromptForChoice($title, $message, $options, 0)
-					switch ($choice) {
-						0 {
-						$Answer5 = 'Yes'       
+			Write-Host "Configure the DHCP option 67 (Boot file name, should be pvsnbpx64.efi)"`n
+			if (Test-Path -Path $DHCPConfig) {
+				$DHCPXML = Import-Clixml -Path $DHCPConfig
+				if ($DHCPXML.TFTPBootfile) {
+					Write-Host -ForegroundColor Cyan $DHCPXML.TFTPBootfile
+					$title = ""
+					$message = "DHCP Option 67 (Boot file name) already configured, do you want to use this option?"
+					$yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes"
+					$no = New-Object System.Management.Automation.Host.ChoiceDescription "&No"
+					$options = [System.Management.Automation.Host.ChoiceDescription[]]($yes, $no)
+					$choice=$host.ui.PromptForChoice($title, $message, $options, 0)
+						switch ($choice) {
+							0 {
+							$Answer6 = 'Yes'       
+							}
+							1 {
+							$Answer6 = 'No'
+							}
 						}
-						1 {
-						$Answer5 = 'No'
-						}
-					}
-					Write-Host `n
+						Write-Host `n
+				}
 			}
-		}
-			if ($Answer4 -eq "Yes") {
+			if ($Answer6 -eq "Yes") {
 				$TFTPBootFile = $DHCPXML.TFTPBootfile
 				Add-member -inputobject $DHCPSelection -MemberType NoteProperty -Name "TFTPBootfile" -Value $TFTPBootFile -Force
 				}
@@ -365,6 +394,33 @@ $choice=$host.ui.PromptForChoice($title, $message, $options, 0)
 				}
 			Add-member -inputobject $DHCPSelection -MemberType NoteProperty -Name "TFTPBootfile" -Value $TFTPBootFile -Force
 			Write-Host `n
+			}
+		}		
+		else {
+			$Option67 = (Get-DhcpServerv4OptionValue -ComputerName $DHCPHost -ScopeId $DHCPScope -OptionId 67).Value
+			$title = ""
+			$message = "DHCP Option 67 with value '$Option67' found in scope options, do you want to use this option or create it in the reservation for each device?"
+			$yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes"
+			$no = New-Object System.Management.Automation.Host.ChoiceDescription "&No"
+			$options = [System.Management.Automation.Host.ChoiceDescription[]]($yes, $no)
+			$choice=$host.ui.PromptForChoice($title, $message, $options, 0)
+				switch ($choice) {
+					0 {
+					$Answer7 = 'Yes'       
+					}
+					1 {
+					$Answer7 = 'No'
+					}
+				}
+				Write-Host `n
+				
+			if ($Answer7 -eq "No") {
+				$TFTPBootFile = Read-Host "Hit enter if you want to use the default EFI file 'pvsnbpx64.efi' or define another value"
+					if(-not($TFTPBootFile)){
+						$TFTPBootFile = "pvsnbpx64.efi"
+					}
+				Add-member -inputobject $DHCPSelection -MemberType NoteProperty -Name "TFTPBootfile" -Value $TFTPBootFile -Force
+				Write-Host `n
 			}
 		}
 		
@@ -383,16 +439,16 @@ $choice=$host.ui.PromptForChoice($title, $message, $options, 0)
 			$choice=$host.ui.PromptForChoice($title, $message, $options, 0)
 				switch ($choice) {
 					0 {
-					$Answer3 = 'Yes'       
+					$Answer8 = 'Yes'       
 					}
 					1 {
-					$Answer3 = 'No'
+					$Answer8 = 'No'
 					}
 				}
 				Write-Host `n
 			}
 		}
-		if ($Answer3 -eq "Yes") {
+		if ($Answer8 -eq "Yes") {
 			$VDATemplate = $VDATemplateXML.VDATemplate
 			Add-member -inputobject $PVSSelection -MemberType NoteProperty -Name "VDATemplate" -Value "$VDATemplate" -Force
 			}
@@ -416,16 +472,16 @@ $choice=$host.ui.PromptForChoice($title, $message, $options, 0)
 			$choice=$host.ui.PromptForChoice($title, $message, $options, 0)
 				switch ($choice) {
 					0 {
-					$Answer3 = 'Yes'       
+					$Answer9 = 'Yes'       
 					}
 					1 {
-					$Answer3 = 'No'
+					$Answer9 = 'No'
 					}
 				}
 				Write-Host `n
 			}
 		}
-		if ($Answer3 -eq "Yes") {
+		if ($Answer9 -eq "Yes") {
 			$VMHost = $VMHostXML.Host
 			Add-member -inputobject $PVSSelection -MemberType NoteProperty -Name "Host" -Value "$VMHost" -Force
 			}
@@ -449,16 +505,16 @@ $choice=$host.ui.PromptForChoice($title, $message, $options, 0)
 			$choice=$host.ui.PromptForChoice($title, $message, $options, 0)
 				switch ($choice) {
 					0 {
-					$Answer3 = 'Yes'       
+					$Answer10 = 'Yes'       
 					}
 					1 {
-					$Answer3 = 'No'
+					$Answer10 = 'No'
 					}
 				}
 				Write-Host `n
 			}
 		}
-		if ($Answer3 -eq "Yes") {
+		if ($Answer10 -eq "Yes") {
 			$VMNetwork = $VMNetworkXML.VMNetwork
 			Add-member -inputobject $PVSSelection -MemberType NoteProperty -Name "VMNetwork" -Value "$VMNetwork" -Force
 			}
@@ -482,16 +538,16 @@ $choice=$host.ui.PromptForChoice($title, $message, $options, 0)
 			$choice=$host.ui.PromptForChoice($title, $message, $options, 0)
 				switch ($choice) {
 					0 {
-					$Answer3 = 'Yes'       
+					$Answer11 = 'Yes'       
 					}
 					1 {
-					$Answer3 = 'No'
+					$Answer11 = 'No'
 					}
 				}
 				Write-Host `n
 			}
 		}
-		if ($Answer3 -eq "Yes") {
+		if ($Answer11 -eq "Yes") {
 			$VMStorage = $VMStorageXML.VMStorage
 			Add-member -inputobject $PVSSelection -MemberType NoteProperty -Name "VMStorage" -Value "$VMStorage" -Force
 			}

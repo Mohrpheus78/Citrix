@@ -146,11 +146,42 @@ $AllvDisks | ForEach-Object {
 	Write-Host ""
 
 # Get AD OU
-if (Get-WindowsFeature | Where-Object {$_.Name -match "RSAT-AD-PowerShell" -and $_.Installed -match "false"}) {
-		Install-WindowsFeature -Name "RSAT-AD-PowerShell"}
+Write-Host -ForegroundColor Yellow "Configuring the organization unit (OU) for the new PVS devices" `n 
 $PVSDevice = (Get-PvsDevice -SiteName $SiteName -CollectionName $CollectionName | Select-Object -First 1).DeviceName
-$OU = (Get-ADComputer -Identity $PVSDevice -Properties CanonicalName).CanonicalName
-$OU = $OU -replace "$env:USERDNSDOMAIN/"," " -replace "/$PVSDevice"," "
+if ($PVSDevice) {
+	if (Get-WindowsFeature | Where-Object {$_.Name -match "RSAT-AD-PowerShell" -and $_.Installed -match "false"}) {
+			Install-WindowsFeature -Name "RSAT-AD-PowerShell"
+		}
+		$OU = (Get-ADComputer -Identity $PVSDevice -Properties CanonicalName).CanonicalName
+		$OU = $OU -replace "$env:USERDNSDOMAIN/"," " -replace "/$PVSDevice"," "
+		$title = ""
+					$message = "A PVS device was found in the device collection, do you want to use the same OU '$OU' for the new devices?"
+					$yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes"
+					$no = New-Object System.Management.Automation.Host.ChoiceDescription "&No"
+					$options = [System.Management.Automation.Host.ChoiceDescription[]]($yes, $no)
+					$choice=$host.ui.PromptForChoice($title, $message, $options, 0)
+						switch ($choice) {
+							0 {
+							$Answer = 'Yes'       
+							}
+							1 {
+							$Answer = 'No'
+							}
+						}
+						Write-Host `n
+	if ($Answer -eq "No") {
+		$OU = Read-Host "Configure the organization unit for the PVS devices in AD, use the canonical name like 'Servers/Citrix/CVAD-Worker' with the domain name"
+		Write-Host `n
+	}
+	else {
+			Write-Host -ForegroundColor Yellow "Using OU '$OU'"	
+	}
+}
+else {
+		$OU = Read-Host "Configure the organization unit for the PVS devices in AD, use the canonical name like 'Servers/Citrix/CVAD-Worker' with the domain name"	
+		Write-Host `n
+}
+pause
 
 # Read CSV
 $CSVpath = "$RootFolder\PVS\VDA.csv"
@@ -166,25 +197,56 @@ foreach ($Hostnames in $CSV) {
 	$IP = $Hostnames.IP
 
 	IF (!(Get-DhcpServerv4Reservation -ComputerName $DHCPConfig.Host -ScopeId $DHCPConfig.Scope | Where-Object {$_.ipaddress -eq $IP})) {
-		Add-DhcpServerv4Reservation -ComputerName $DHCPConfig.Host -ScopeId $DHCPConfig.Scope -IPAddress $IP -ClientId $MacReplace -Description $Hostname -Name $Hostname -Type Dhcp
-		if ($DHCPConfig.TFTP) {
-			Set-DhcpServerv4OptionValue -ComputerName $DHCPConfig.Host -ReservedIP $IP -OptionId 66 -Value $DHCPConfig.TFTP -ErrorAction SilentlyContinue
-			}
-		if ($DHCPConfig.TFTPBootfile) {
-		Set-DhcpServerv4OptionValue -ComputerName $DHCPConfig.Host -ReservedIP $IP -OptionId 67 -Value $DHCPConfig.TFTPBootfile -ErrorAction SilentlyContinue
-			}
-		if ($DHCPConfig.TFTPBootfile -eq "pvsnbpx64.efi") {
-		Set-DhcpServerv4OptionValue -ComputerName $DHCPConfig.Host -ReservedIP $IP -OptionId 11 -Value $PVSServers.split(",") -ErrorAction SilentlyContinue
+		Try {
+			Add-DhcpServerv4Reservation -ComputerName $DHCPConfig.Host -ScopeId $DHCPConfig.Scope -IPAddress $IP -ClientId $MacReplace -Description $Hostname -Name $Hostname -Type Dhcp
+			Write-Host -ForegroundColor Green "DHCP reservations  successfully created, check logfile '$log'"`n
 		}
-		Write-Host -ForegroundColor Green "DHCP reservations  successfully created, check logfile '$log'"`n
+		catch {
+			write-warning "Error: $_."
+		}	
+			
+		if ($DHCPConfig.TFTP) {
+			Try {
+				Set-DhcpServerv4OptionValue -ComputerName $DHCPConfig.Host -ReservedIP $IP -OptionId 66 -Value $DHCPConfig.TFTP -ErrorAction SilentlyContinue
+				Write-Host -ForegroundColor Green "DHCP option ID 66 successfully created"`n
+			}
+			catch {
+				write-warning "Error: $_."
+			}
+		}
+		
+		if ($DHCPConfig.TFTPBootfile) {
+			Try {
+				Set-DhcpServerv4OptionValue -ComputerName $DHCPConfig.Host -ReservedIP $IP -OptionId 67 -Value $DHCPConfig.TFTPBootfile -ErrorAction SilentlyContinue
+				Write-Host -ForegroundColor Green "DHCP option ID 67 successfully created"`n
+			}
+			catch {
+				write-warning "Error: $_."
+			}
+		}
+		
+		if ($DHCPConfig.TFTPBootfile -eq "pvsnbpx64.efi") {
+			Try {
+				Set-DhcpServerv4OptionValue -ComputerName $DHCPConfig.Host -ReservedIP $IP -OptionId 11 -Value $PVSServers.split(",") -ErrorAction SilentlyContinue
+				Write-Host -ForegroundColor Green "DHCP option ID 11 successfully created"`n
+			}
+			catch {
+				write-warning "Error: $_."
+			}
+		}
 	}
 	ELSE {
 		Write-Host -ForegroundColor Red "DHCP reservation for '$Hostname' already exists, skipping!"`n
 		}
 }
 # Replicate to failover partner
-Invoke-DhcpServerv4FailoverReplication -ComputerName $DHCPConfig.Host -ScopeID $DHCPConfig.Scope -force -EA SilentlyContinue | Out-Null
-
+Try {
+	Invoke-DhcpServerv4FailoverReplication -ComputerName $DHCPConfig.Host -ScopeID $DHCPConfig.Scope -force -EA SilentlyContinue | Out-Null
+	Write-Host -ForegroundColor Green "DHCP scope successfully replicated to failiver partner"`n
+}
+catch {
+	write-warning "Error: $_."
+}
 
 # Create PVS devices and computer AD accounts
 Write-Host -ForegroundColor Yellow "Creating PVS devices and computer AD accounts"
@@ -194,16 +256,20 @@ foreach ($Hostnames in $CSV) {
 	$MacReplace = $Mac -replace (":", "-")
 		
 	IF (!(Get-PvsDevice | Where-Object {$_.Name -eq $Hostname})) {
-		New-PvsDevice -SiteName $SiteName -CollectionName $CollectionName -DeviceName $Hostname -DeviceMac $MacReplace | Out-Null
-		Add-PvsDeviceToDomain -DeviceName $Hostnames.Hostname -Domain $ENV:userdnsdomain -OrganizationUnit $OU  | Out-Null
-		Add-PvsDiskLocatorToDevice -DiskLocatorName $vDiskName -DeviceName $Hostnames.Hostname -SiteName $SiteName -StoreName $StoreName
-		Write-Host -ForegroundColor Green "New PVS devices successfully created, check logfile '$log'"`n
+		Try {
+			New-PvsDevice -SiteName $SiteName -CollectionName $CollectionName -DeviceName $Hostname -DeviceMac $MacReplace | Out-Null
+			Add-PvsDeviceToDomain -DeviceName $Hostnames.Hostname -Domain $ENV:userdnsdomain -OrganizationUnit $OU  | Out-Null
+			Add-PvsDiskLocatorToDevice -DiskLocatorName $vDiskName -DeviceName $Hostnames.Hostname -SiteName $SiteName -StoreName $StoreName
+			Write-Host -ForegroundColor Green "New PVS device '$Hostname' successfully created, check logfile '$log'"`n
+		}
+		catch {
+			write-warning "Error: $_."
+		}
 	}
 	ELSE {
 		Write-Host -ForegroundColor Red "PVS device '$Hostname' already exists, skipping!"`n
 		}
 }
-
 
 # Stop Logging
 $ScriptEnd = Get-Date

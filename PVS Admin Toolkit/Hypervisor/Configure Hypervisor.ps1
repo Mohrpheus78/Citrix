@@ -47,6 +47,7 @@ function Use-RunAs
 Use-RunAs
 
 # Variablen
+$RootFolder = Split-Path -Path $PSScriptRoot
 $HypervisorConfig = "$PSScriptRoot\Hypervisor.xml"
 $HypervisorSelection = New-Object PSObject
 $CredentialConfig = (Get-ChildItem -Path $PSScriptRoot -Filter Credentials-$env:username*.xml).Name
@@ -62,7 +63,7 @@ function Show-Menu
     Write-Host "======== $Title ========"
     Write-Host `n
     Write-Host "1: VMWare ESX"
-    Write-Host "2: Citrix Hypervisor (XenServer)"
+    Write-Host "2: XenServer (Citrix Hypervisor)"
     #Write-Host "3: Nutanix AHV"   
     Write-Host `n
 }
@@ -111,11 +112,11 @@ IF (Test-Path -Path $HypervisorConfig) {
 			}
 		Add-member -inputobject $HypervisorSelection -MemberType NoteProperty -Name "Hypervisor" -Value $Hypervisor -Force
 			
+		<#
 		# Prepare for module installation
 		[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 		IF (!(Test-Path -Path "C:\Program Files\PackageManagement\ProviderAssemblies\nuget")) {
-			Find-PackageProvider -Name 'Nuget' -ForceBootstrap -IncludeDependencies
-			}
+			Find-PackageProvider -Name 'Nuget' -ForceBootstrap -IncludeDependencies }
 		try {
 			set-PSRepository -Name PSGallery -InstallationPolicy Trusted }
 		catch {
@@ -124,6 +125,7 @@ IF (Test-Path -Path $HypervisorConfig) {
 			Read-Host "Presse ENTER to exit"
 			BREAK
 		}
+		#>
 
 		# Hypervisor name or IP address
 		Write-Host "Configure your hypervisor IP address or hostname (vCenter/ESXi/XenServer/AHV) once"
@@ -186,7 +188,7 @@ IF (([string]::ISNullOrEmpty( $CredentialConfig) -eq $False) -or ($Answer1 -eq "
 				}	
 			}
 				ELSE {
-					Get-Credential -UserName $ENV:UserDomain\$ENV:UserName -Message "Enter vSphere Administrator account (DOMAIN\Admin) or ESXi Account " | Export-CliXml  -Path "$PSScriptRoot\Credentials-$env:username-ESX.xml"
+					Get-Credential -UserName $ENV:UserName@$ENV:UserDNSDomain -Message "Enter vSphere Administrator account (DOMAIN\Admin) or ESXi Account " | Export-CliXml  -Path "$PSScriptRoot\Credentials-$env:username-ESX.xml"
 				}
 				# Install Powershell module
 				IF (!(Get-Module -ListAvailable -Name VMWare.PowerCLI)) {
@@ -194,9 +196,19 @@ IF (([string]::ISNullOrEmpty( $CredentialConfig) -eq $False) -or ($Answer1 -eq "
 						Install-Module VMWare.PowerCLI -Scope AllUsers -Force
 					}
 					catch { 
-					Write-Host -ForegroundColor Red "Error - Failed to install VMWare PowerCLI module (Error: $($Error[0]))"
+					Write-Host -ForegroundColor Red "Error - Failed to install VMWare PowerCLI module (Error: $($Error[0])), download and install the VMWare PowerCLI module!"
+					Read-Host
 					break               
 					} 
+				}
+				Write-Host -ForegroundColor Yellow "Importing VMWare Powershell module, please wait..."	
+				try {
+					Import-Module -Name VMWare.PowerCLI
+				}
+				catch { 
+					Write-Host -ForegroundColor Red "Error - Failed to import VMWare PowerCLI module (Error: $($Error[0]))"
+					Read-Host
+					break
 				}
 		}
 					
@@ -207,10 +219,13 @@ IF (([string]::ISNullOrEmpty( $CredentialConfig) -eq $False) -or ($Answer1 -eq "
 			Get-Credential -UserName root -Message "Domain Administrator account (DOMAIN\Admin) or root " | Export-CliXml  -Path "$PSScriptRoot\Credentials-$env:username-Xen.xml"
 			# Check Powershell module
 			IF (!(Get-Module -ListAvailable -Name XenServerPSModule)) {
-				Write-Host -ForegroundColor Red "XenServer Powershell module 'XenServerPSModule' not found, download the XenServer SDK and install the module"
+				Write-Host -ForegroundColor Red "XenServer Powershell module 'XenServerPSModule' not found, download the XenServer SDK and install the module: https://www.xenserver.com/downloads"
+				Read-Host
+				break
 			}
 		}
-					
+		
+		<#		
 		IF ($Hypervisor -eq 'AHV') {
 			#Write-Host -ForegroundColor Yellow "Enter your Domain Administrator account (DOMAIN\Admin) or root"
 			Write-Host `n
@@ -237,5 +252,6 @@ IF (([string]::ISNullOrEmpty( $CredentialConfig) -eq $False) -or ($Answer1 -eq "
 			IF (!(Get-Module -ListAvailable -Name Nutanix.Cli)) {
 				Install-Module Nutanix.Cli -Scope AllUsers -Force
 			}
-		}	
+		}
+		#>
 }
